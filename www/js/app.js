@@ -2082,6 +2082,9 @@ const VB = (() => {
             </div>
           </div>
           <div style="display:flex;gap:.5rem;align-items:center">
+            <button type="button" class="brand-button btn" id="btn-admin-enable-notif" style="padding:.4rem .85rem;font-size:.78rem;display:inline-flex;align-items:center;gap:.4rem">
+              🔔 Ativar Notificações
+            </button>
             <a class="btn btn-ghost" href="/" style="padding:.4rem .7rem;font-size:.78rem">Site público</a>
             <button class="btn-ghost btn" data-logout style="padding:.4rem .7rem;font-size:.78rem">Sair</button>
           </div>
@@ -2129,6 +2132,26 @@ const VB = (() => {
       window.addEventListener("popstate", () => {
         if (document.body.dataset.page === "dashboard") pageDashboard();
       });
+    }
+
+    // Botão de Ativar Notificações no Dashboard
+    const btnNotif = document.getElementById("btn-admin-enable-notif");
+    if (btnNotif) {
+      const perm = getNotificationPermission();
+      if (perm === "granted") {
+        btnNotif.innerHTML = "🔔 Notificações Ativas ✔️";
+        btnNotif.classList.remove("brand-button");
+        btnNotif.classList.add("btn-ghost");
+        btnNotif.onclick = () => {
+          triggerTestNotification();
+        };
+      } else {
+        btnNotif.onclick = async () => {
+          btnNotif.textContent = "A ativar...";
+          await requestNotificationPermission();
+          pageDashboard();
+        };
+      }
     }
     document.querySelectorAll("[data-st]").forEach((b) => {
       b.onclick = async () => {
