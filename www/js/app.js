@@ -2082,8 +2082,8 @@ const VB = (() => {
             </div>
           </div>
           <div style="display:flex;gap:.5rem;align-items:center">
-            <button type="button" class="brand-button btn" id="btn-admin-enable-notif" style="padding:.4rem .85rem;font-size:.78rem;display:inline-flex;align-items:center;gap:.4rem">
-              🔔 Ativar Notificações
+            <button type="button" class="btn btn-ghost" id="btn-admin-enable-notif" title="Notificações no Telemóvel" style="width:2.35rem;height:2.35rem;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;border-radius:50%">
+              🔔
             </button>
             <a class="btn btn-ghost" href="/" style="padding:.4rem .7rem;font-size:.78rem">Site público</a>
             <button class="btn-ghost btn" data-logout style="padding:.4rem .7rem;font-size:.78rem">Sair</button>
@@ -2134,20 +2134,23 @@ const VB = (() => {
       });
     }
 
-    // Botão de Ativar Notificações no Dashboard
+    // Botão de Notificações compacto no Dashboard (apenas ícone)
     const btnNotif = document.getElementById("btn-admin-enable-notif");
     if (btnNotif) {
       const perm = getNotificationPermission();
       if (perm === "granted") {
-        btnNotif.innerHTML = "🔔 Notificações Ativas ✔️";
-        btnNotif.classList.remove("brand-button");
-        btnNotif.classList.add("btn-ghost");
+        btnNotif.innerHTML = "🔔";
+        btnNotif.title = "Notificações Ativas ✔️ (Clica para testar)";
+        btnNotif.style.borderColor = "var(--accent)";
+        btnNotif.style.color = "var(--accent)";
         btnNotif.onclick = () => {
           triggerTestNotification();
         };
       } else {
+        btnNotif.innerHTML = "🔕";
+        btnNotif.title = "Clica para ativar notificações no telemóvel";
         btnNotif.onclick = async () => {
-          btnNotif.textContent = "A ativar...";
+          btnNotif.innerHTML = "⏳";
           await requestNotificationPermission();
           pageDashboard();
         };
