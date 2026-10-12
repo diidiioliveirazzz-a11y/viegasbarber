@@ -40,7 +40,8 @@ const VAPID_EMAIL = process.env.VAPID_EMAIL || "mailto:suporte@viegasbarber.pt";
 webpush.setVapidDetails(VAPID_EMAIL, VAPID_PUBLIC_KEY, VAPID_PRIVATE_KEY);
 
 const app = express();
-const SESSION_MAX_AGE = 365 * 24 * 60 * 60 * 1000;
+app.set("trust proxy", 1);
+const SESSION_MAX_AGE = 365 * 24 * 60 * 60 * 1000; // 1 ano inteiro de persistência contínua
 const www = path.join(__dirname, "..", "www");
 
 app.use(express.json({ limit: "16mb" }));
@@ -52,12 +53,12 @@ app.use(
     store: new NoSQLSessionStore({ ttl: SESSION_MAX_AGE }),
     resave: false,
     saveUninitialized: false,
-    rolling: true,
+    rolling: true, // Renova o prazo a cada visita do Viegas
     cookie: {
       maxAge: SESSION_MAX_AGE,
       httpOnly: true,
       sameSite: "lax",
-      secure: false, // works seamlessly on both http and https/proxies
+      secure: false, // Compatível com HTTP local e HTTPS do Render
     },
   })
 );
