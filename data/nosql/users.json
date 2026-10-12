@@ -1,0 +1,98 @@
+[
+  {
+    "_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "name": "Diogo Viegas",
+    "email": "admin@instagram.user",
+    "password": "$2b$12$/doLSMsIGMhBTszRXEXZIei9YBSXJdj25fO7sLoU3myjqivt0AGUm",
+    "role": "ADMIN",
+    "created_at": "2026-10-09T15:54:07.760Z",
+    "updated_at": "2026-10-09T15:54:07.760Z"
+  },
+  {
+    "_id": "3d5119e7-b117-43a6-9b61-397819e1fee4",
+    "id": "3d5119e7-b117-43a6-9b61-397819e1fee4",
+    "name": "Cliente Teste",
+    "email": "cliente1791561470956@teste.com",
+    "password": "$2b$12$W/anz.jXiTV9s2Zjwl9hse2q3P1Nfi3fFAi2rHl2k7KuiWWLA.ADm",
+    "role": "CLIENT",
+    "has_subscription": false,
+    "created_at": "2026-10-09T15:57:51.571Z",
+    "updated_at": "2026-10-09T15:57:51.577Z"
+  },
+  {
+    "_id": "6a67e810-321b-42c1-a4b7-185ff18901e1",
+    "id": "6a67e810-321b-42c1-a4b7-185ff18901e1",
+    "name": "Diogo Cliente",
+    "email": "test1791561486282@cliente.pt",
+    "password": "$2b$12$mx552uyKCHM5OpW9EZshk.us/WJ8Uc3STVgnS4sfQAZDI1eN6XMBW",
+    "role": "CLIENT",
+    "has_subscription": false,
+    "created_at": "2026-10-09T15:58:06.812Z",
+    "updated_at": "2026-10-09T15:58:06.812Z"
+  },
+  {
+    "_id": "1060ac07-05bb-49cd-b6f2-f3a00f9ae8dc",
+    "id": "1060ac07-05bb-49cd-b6f2-f3a00f9ae8dc",
+    "name": "cscscs",
+    "email": "scscs@instagram.user",
+    "password": "$2b$12$YQL5RPmSU.rCpZKW6m9uf.6sfyJZc1QCj0xQkwSP8iHsG.izc1PSO",
+    "role": "CLIENT",
+    "has_subscription": false,
+    "created_at": "2026-10-09T16:22:48.462Z",
+    "updated_at": "2026-10-09T16:22:48.464Z"
+  },
+  {
+    "_id": "73827997-ccc2-4d22-b6dc-22b1e8ca0f2e",
+    "id": "73827997-ccc2-4d22-b6dc-22b1e8ca0f2e",
+    "name": "dhdhfh",
+    "email": "dhdhdbd@instagram.user",
+    "password": "$2b$12$AfhDvJyuunEnYPAivuwz2e8Cx0d.TbZnJYvN4dfXvHr9U0W5rtGKO",
+    "role": "CLIENT",
+    "has_subscription": false,
+    "created_at": "2026-10-09T22:37:59.883Z",
+    "updated_at": "2026-10-09T22:37:59.883Z"
+  },
+  {
+    "_id": "aaa583be-953a-4c87-83fe-84e061776641",
+    "id": "aaa583be-953a-4c87-83fe-84e061776641",
+    "name": "Cliente Teste Bairro",
+    "phone": "919999999",
+    "email": "bairro_919999999@bairro.viegasbarber.pt",
+    "role": "CLIENT",
+    "created_at": "2026-10-12T19:04:18.285Z",
+    "updated_at": "2026-10-12T19:04:18.286Z"
+  },
+  {
+    "_id": "eb7c6ce8-3f32-483d-a98a-45d7a2e6abaf",
+    "id": "eb7c6ce8-3f32-483d-a98a-45d7a2e6abaf",
+    "name": "Diogo Oliveira",
+    "phone": "+14386196543",
+    "email": "bairro_14386196543@bairro.viegasbarber.pt",
+    "role": "CLIENT",
+    "created_at": "2026-10-12T19:11:06.170Z",
+    "updated_at": "2026-10-12T19:11:06.170Z"
+  },
+  {
+    "_id": "0e6c48ef-184b-454d-968c-167de2a8a923",
+    "id": "0e6c48ef-184b-454d-968c-167de2a8a923",
+    "name": "Cliente Com Insta",
+    "phone": "918888888",
+    "instagram": "@tiago_barber",
+    "email": "bairro_918888888@bairro.viegasbarber.pt",
+    "role": "CLIENT",
+    "created_at": "2026-10-12T19:17:39.313Z",
+    "updated_at": "2026-10-12T19:17:39.314Z"
+  },
+  {
+    "_id": "0c69a75c-14b0-47ff-b453-0af8969ba643",
+    "id": "0c69a75c-14b0-47ff-b453-0af8969ba643",
+    "name": "Cliente Teste",
+    "phone": "912345999",
+    "instagram": null,
+    "email": "bairro_912345999@bairro.viegasbarber.pt",
+    "role": "CLIENT",
+    "created_at": "2026-10-12T19:59:41.845Z",
+    "updated_at": "2026-10-12T19:59:41.845Z"
+  }
+]

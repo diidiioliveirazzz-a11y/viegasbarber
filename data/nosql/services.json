@@ -1,0 +1,57 @@
+[
+  {
+    "_id": "srv-corte-12",
+    "id": "srv-corte-12",
+    "name": "Corte",
+    "description": "Corte de cabelo contemporâneo à máquina ou tesoura com degradê e acabamento de alta precisão.",
+    "price": 12,
+    "duration": 45,
+    "isActive": true,
+    "created_at": "2026-10-09T16:00:00.000Z",
+    "updated_at": "2026-10-09T22:58:31.931Z"
+  },
+  {
+    "_id": "srv-corte-sobrancelha-14",
+    "id": "srv-corte-sobrancelha-14",
+    "name": "Corte + Sobrancelha",
+    "description": "Corte completo com alinhamento e limpeza precisa de sobrancelhas a lâmina/navalha.",
+    "price": 14,
+    "duration": 45,
+    "isActive": true,
+    "created_at": "2026-10-09T16:00:00.000Z",
+    "updated_at": "2026-10-09T22:58:31.931Z"
+  },
+  {
+    "_id": "srv-corte-sobrancelha-tinta-16",
+    "id": "srv-corte-sobrancelha-tinta-16",
+    "name": "Corte + Sobrancelha + Tinta",
+    "description": "Corte, definição de sobrancelha e aplicação de tinta/pigmentação para acabamento nítido e impecável.",
+    "price": 16,
+    "duration": 45,
+    "isActive": true,
+    "created_at": "2026-10-09T16:00:00.000Z",
+    "updated_at": "2026-10-09T22:58:31.931Z"
+  },
+  {
+    "_id": "srv-corte-barba-17",
+    "id": "srv-corte-barba-17",
+    "name": "Corte + Barba",
+    "description": "A combinação clássica: corte de cabelo perfeito aliado à modelação e cuidado completo da barba.",
+    "price": 17,
+    "duration": 45,
+    "isActive": true,
+    "created_at": "2026-10-09T16:00:00.000Z",
+    "updated_at": "2026-10-09T22:58:31.931Z"
+  },
+  {
+    "_id": "srv-pack-completo-18",
+    "id": "srv-pack-completo-18",
+    "name": "Pack Completo",
+    "description": "A experiência total de cuidado masculino: corte, barba, sobrancelha e finalização de excelência.",
+    "price": 18,
+    "duration": 45,
+    "isActive": true,
+    "created_at": "2026-10-09T16:00:00.000Z",
+    "updated_at": "2026-10-09T22:58:31.931Z"
+  }
+]

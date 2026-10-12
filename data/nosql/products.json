@@ -1,0 +1,14 @@
+[
+  {
+    "_id": "a3584368-7cec-4a65-878c-0e2169682394",
+    "id": "a3584368-7cec-4a65-878c-0e2169682394",
+    "name": "Ceras para cabelo",
+    "description": null,
+    "price": 12,
+    "stock": 0,
+    "category": "Ceras",
+    "imageUrl": null,
+    "created_at": "2026-10-09T16:03:11.891Z",
+    "updated_at": "2026-10-09T16:03:11.891Z"
+  }
+]

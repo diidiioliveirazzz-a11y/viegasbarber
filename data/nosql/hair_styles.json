@@ -1,0 +1,38 @@
+[
+  {
+    "id": "style-corte-1",
+    "title": "Fade Clássico & Lineup",
+    "category": "Fade",
+    "description": "Degradê suave e contorno frontal bem definido com precisão milimétrica.",
+    "imageUrl": "/img/cortes/corte-1.jpg",
+    "likes": 28,
+    "created_at": "2026-10-09T16:00:00.000Z"
+  },
+  {
+    "id": "style-corte-2",
+    "title": "Low Fade & Sobrancelha Freestyle",
+    "category": "Sobrancelha / Fade",
+    "description": "Degradê moderno, cachos naturais no topo e risco estilizado na sobrancelha.",
+    "imageUrl": "/img/cortes/corte-2.jpg",
+    "likes": 42,
+    "created_at": "2026-10-09T16:05:00.000Z"
+  },
+  {
+    "id": "style-corte-3",
+    "title": "Taper Fade & Textura",
+    "category": "Taper Fade",
+    "description": "Taper fade nas têmporas e nuca, cachos volumosos e detalhe na sobrancelha.",
+    "imageUrl": "/img/cortes/corte-3.jpg",
+    "likes": 51,
+    "created_at": "2026-10-09T16:10:00.000Z"
+  },
+  {
+    "id": "style-corte-4",
+    "title": "Low Taper Fade & Flow",
+    "category": "Taper / Flow",
+    "description": "Acabamento lateral nítido preservando o comprimento e o fluxo do cabelo.",
+    "imageUrl": "/img/cortes/corte-4.jpg",
+    "likes": 36,
+    "created_at": "2026-10-09T16:15:00.000Z"
+  }
+]
