@@ -3,9 +3,15 @@ const VB = (() => {
   let theme = localStorage.getItem("vb-theme") || "dark";
 
   async function api(path, options = {}) {
+    const token = localStorage.getItem("vb_auth_token");
+    const headers = { "Content-Type": "application/json", ...(options.headers || {}) };
+    if (token) {
+      headers["Authorization"] = `Bearer ${token}`;
+      headers["x-auth-token"] = token;
+    }
     const res = await fetch(path, {
       credentials: "include",
-      headers: { "Content-Type": "application/json", ...(options.headers || {}) },
+      headers,
       ...options,
       body: options.body && typeof options.body !== "string" ? JSON.stringify(options.body) : options.body,
     });
@@ -149,7 +155,11 @@ const VB = (() => {
     });
     document.querySelectorAll("[data-logout]").forEach((btn) => {
       btn.onclick = async () => {
-        await api("/api/auth/logout", { method: "POST" });
+        localStorage.removeItem("vb_auth_token");
+        localStorage.removeItem("vb_user");
+        try {
+          await api("/api/auth/logout", { method: "POST" });
+        } catch {}
         location.href = "/";
       };
     });
@@ -273,10 +283,10 @@ const VB = (() => {
         });
       }
 
-      await fetch("/api/push/subscribe", {
+      const isStaff = user && (user.role === "ADMIN" || user.role === "BARBER");
+      await api("/api/push/subscribe", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ subscription: sub }),
+        body: { subscription: sub, userId: user?.id || null, isAdmin: isStaff },
       });
     } catch (err) {
       console.warn("Registo de Push Subscription:", err);
@@ -348,7 +358,7 @@ const VB = (() => {
     const perm = getNotificationPermission();
     const existing = document.getElementById("pwa-notif-floating-banner");
 
-    if (perm === "granted" || perm === "unsupported") {
+    if (perm === "granted" || perm === "unsupported" || document.body.dataset.page === "dashboard" || (user && (user.role === "ADMIN" || user.role === "BARBER"))) {
       if (existing) existing.remove();
       return;
     }
@@ -1628,6 +1638,12 @@ const VB = (() => {
             : String(fd.get("email") || "").toLowerCase().trim();
         try {
           const data = await api("/api/auth/login", { method: "POST", body: { email: identifier, password: fd.get("password") } });
+          if (data.token) {
+            localStorage.setItem("vb_auth_token", data.token);
+          }
+          if (data.user) {
+            localStorage.setItem("vb_user", JSON.stringify(data.user));
+          }
           location.href = data.user.role === "ADMIN" || data.user.role === "BARBER" ? "/dashboard" : "/";
         } catch (err) {
           const box = document.getElementById("err");
@@ -1674,6 +1690,12 @@ const VB = (() => {
               password: fd.get("password"),
             },
           });
+          if (data.token) {
+            localStorage.setItem("vb_auth_token", data.token);
+          }
+          if (data.user) {
+            localStorage.setItem("vb_user", JSON.stringify(data.user));
+          }
           location.href = data.user.role === "ADMIN" || data.user.role === "BARBER" ? "/dashboard" : "/";
         } catch (err) {
           const box = document.getElementById("err");
@@ -1779,7 +1801,25 @@ const VB = (() => {
   }
 
   async function pageDashboard() {
-    if (!user || (user.role !== "ADMIN" && user.role !== "BARBER")) return (location.href = "/login");
+    if (!user || (user.role !== "ADMIN" && user.role !== "BARBER")) {
+      const storedToken = localStorage.getItem("vb_auth_token");
+      if (storedToken) {
+        try {
+          const res = await api("/api/me");
+          user = res.user;
+          if (res.token) localStorage.setItem("vb_auth_token", res.token);
+        } catch {}
+      }
+      if (!user) {
+        try {
+          const cached = JSON.parse(localStorage.getItem("vb_user") || "null");
+          if (cached && (cached.role === "ADMIN" || cached.role === "BARBER")) {
+            user = cached;
+          }
+        } catch {}
+      }
+      if (!user || (user.role !== "ADMIN" && user.role !== "BARBER")) return (location.href = "/login");
+    }
     const todayIso = getLocalDateStr();
     const tab = new URLSearchParams(location.search).get("tab") || "hoje";
     const links = [
@@ -2140,10 +2180,11 @@ const VB = (() => {
       const perm = getNotificationPermission();
       if (perm === "granted") {
         btnNotif.innerHTML = "🔔";
-        btnNotif.title = "Notificações Ativas ✔️ (Clica para testar)";
+        btnNotif.title = "Notificações Ativas ✔️ (Clica para testar no telemóvel)";
         btnNotif.style.borderColor = "var(--accent)";
         btnNotif.style.color = "var(--accent)";
-        btnNotif.onclick = () => {
+        btnNotif.onclick = async () => {
+          await registerWebPushSubscription();
           triggerTestNotification();
         };
       } else {
@@ -2151,7 +2192,7 @@ const VB = (() => {
         btnNotif.title = "Clica para ativar notificações no telemóvel";
         btnNotif.onclick = async () => {
           btnNotif.innerHTML = "⏳";
-          await requestNotificationPermission();
+          await requestPushPermission();
           pageDashboard();
         };
       }
@@ -2266,15 +2307,31 @@ const VB = (() => {
 
   async function boot(page) {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js?v=19").then((reg) => {
+      navigator.serviceWorker.register("/sw.js?v=20").then((reg) => {
         reg.update();
       }).catch(() => {});
     }
     applyTheme();
     try {
-      user = (await api("/api/me")).user;
+      const meData = await api("/api/me");
+      user = meData.user;
+      if (meData.token) {
+        localStorage.setItem("vb_auth_token", meData.token);
+      }
+      if (user) {
+        localStorage.setItem("vb_user", JSON.stringify(user));
+      }
     } catch {
-      user = null;
+      try {
+        const cached = JSON.parse(localStorage.getItem("vb_user") || "null");
+        if (cached && localStorage.getItem("vb_auth_token")) {
+          user = cached;
+        } else {
+          user = null;
+        }
+      } catch {
+        user = null;
+      }
     }
     if ("Notification" in window && Notification.permission === "granted") {
       registerWebPushSubscription();

@@ -162,6 +162,13 @@ button, input, textarea, select { font: inherit; }
   .navbar.has-admin-bar ~ .page-shell {
     padding-top: 6.8rem;
   }
+  .logo .badge, .logo .dot { display: none !important; }
+  .logo { font-size: 1.15rem; gap: 0.4rem; }
+  .logo .logo-img { width: 2.1rem; height: 2.1rem; }
+  .nav-inner { padding: 0 0.65rem; gap: 0.4rem; height: 4rem; }
+  .nav-mobile { gap: 0.35rem; }
+  .nav-mobile .btn-marcar-mob { padding: 0.4rem 0.65rem; font-size: 0.72rem; }
+  .icon-btn { width: 2.1rem; height: 2.1rem; }
 }
 .navbar-accent-line {
   position: absolute; inset: auto 0 0 0; height: 1px;

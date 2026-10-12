@@ -1,4 +1,4 @@
-const CACHE_NAME = "viegas-barber-v19";
+const CACHE_NAME = "viegas-barber-v20";
 const STATIC_ASSETS = [
   "/",
   "/marcar",
@@ -10,8 +10,8 @@ const STATIC_ASSETS = [
   "/apple-touch-icon.png",
   "/icon-192.png",
   "/icon-512.png",
-  "/css/style.css?v=19",
-  "/js/app.js?v=19"
+  "/css/style.css?v=20",
+  "/js/app.js?v=20"
 ];
 
 self.addEventListener("install", (event) => {

@@ -46,10 +46,40 @@ const www = path.join(__dirname, "..", "www");
 
 app.use(express.json({ limit: "16mb" }));
 app.use(express.urlencoded({ extended: true, limit: "16mb" }));
+const crypto = require("crypto");
+const AUTH_SECRET = process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET || "viegas-barber-secret-2026";
+
+function createAuthToken(user) {
+  const payload = Buffer.from(
+    JSON.stringify({
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      t: Date.now(),
+    })
+  ).toString("base64url");
+  const signature = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
+  return `${payload}.${signature}`;
+}
+
+function verifyAuthToken(token) {
+  if (!token || typeof token !== "string" || !token.includes(".")) return null;
+  const [payload, signature] = token.split(".");
+  const expected = crypto.createHmac("sha256", AUTH_SECRET).update(payload).digest("base64url");
+  if (signature !== expected) return null;
+  try {
+    const data = JSON.parse(Buffer.from(payload, "base64url").toString("utf8"));
+    return data;
+  } catch {
+    return null;
+  }
+}
+
 app.use(
   session({
     name: "viegas.sid",
-    secret: process.env.SESSION_SECRET || process.env.NEXTAUTH_SECRET || "viegas-barber-secret-2026",
+    secret: AUTH_SECRET,
     store: new NoSQLSessionStore({ ttl: SESSION_MAX_AGE }),
     resave: false,
     saveUninitialized: false,
@@ -62,6 +92,32 @@ app.use(
     },
   })
 );
+
+// Middleware de Autenticação Permanente por Token (Garante que no iPhone / PWA o Viegas NUNCA perde a sessão)
+app.use((req, res, next) => {
+  if (req.session && req.session.user) return next();
+
+  const authHeader = req.headers.authorization || "";
+  let token = null;
+  if (authHeader.startsWith("Bearer ")) {
+    token = authHeader.substring(7).trim();
+  } else if (req.headers["x-auth-token"]) {
+    token = req.headers["x-auth-token"];
+  }
+
+  if (token) {
+    const verified = verifyAuthToken(token);
+    if (verified && verified.id) {
+      req.session.user = {
+        id: verified.id,
+        name: verified.name,
+        email: verified.email,
+        role: verified.role,
+      };
+    }
+  }
+  next();
+});
 
 app.use(
   express.static(www, {
@@ -333,7 +389,12 @@ async function offerNextWaitlistEntry(date, startTime) {
 // -------------------------------------------------------------
 
 app.get("/api/me", (req, res) => {
-  res.json({ user: currentUser(req) });
+  const user = currentUser(req);
+  if (user) {
+    const token = createAuthToken(user);
+    return res.json({ user, token });
+  }
+  res.json({ user: null });
 });
 
 app.post("/api/auth/login", async (req, res) => {
@@ -354,7 +415,8 @@ app.post("/api/auth/login", async (req, res) => {
     }
 
     req.session.user = { id: user.id, name: user.name, email: user.email, role: user.role };
-    res.json({ user: req.session.user });
+    const token = createAuthToken(user);
+    res.json({ user: req.session.user, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Não foi possível iniciar sessão." });
@@ -419,7 +481,8 @@ app.post("/api/auth/register", async (req, res) => {
     });
 
     req.session.user = { id: userId, name, email, role: "CLIENT" };
-    res.status(201).json({ message: "Conta criada com sucesso", user: req.session.user });
+    const token = createAuthToken(req.session.user);
+    res.status(201).json({ message: "Conta criada com sucesso", user: req.session.user, token });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Ocorreu um erro ao criar a conta" });
@@ -1048,7 +1111,11 @@ app.post("/api/push/subscribe", async (req, res) => {
     if (!subscription || !subscription.endpoint) {
       return res.status(400).json({ error: "Subscrição inválida." });
     }
-    const userId = req.session.user?.id || null;
+    let userId = req.session.user?.id || req.body?.userId || null;
+    if (!userId && req.body?.isAdmin) {
+      const adminUser = await db.users().findOne({ role: "ADMIN" });
+      if (adminUser) userId = adminUser.id;
+    }
     const endpoint = subscription.endpoint;
 
     await db.push_subscriptions().updateOne(
