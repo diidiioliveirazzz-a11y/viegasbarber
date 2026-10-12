@@ -76,6 +76,14 @@ function verifyAuthToken(token) {
   }
 }
 
+function getCookieValue(req, name) {
+  const header = req.headers.cookie || "";
+  const match = header.match(new RegExp("(^|; )" + name + "=([^;]*)"));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+const isProduction = process.env.NODE_ENV === "production" || !!process.env.RENDER;
+
 app.use(
   session({
     name: "viegas.sid",
@@ -88,7 +96,7 @@ app.use(
       maxAge: SESSION_MAX_AGE,
       httpOnly: true,
       sameSite: "lax",
-      secure: false, // Compatível com HTTP local e HTTPS do Render
+      secure: isProduction ? true : "auto",
     },
   })
 );
@@ -103,6 +111,10 @@ app.use((req, res, next) => {
     token = authHeader.substring(7).trim();
   } else if (req.headers["x-auth-token"]) {
     token = req.headers["x-auth-token"];
+  } else if (req.query && req.query.token) {
+    token = req.query.token;
+  } else {
+    token = getCookieValue(req, "vb_token");
   }
 
   if (token) {
@@ -416,6 +428,20 @@ app.post("/api/auth/login", async (req, res) => {
 
     req.session.user = { id: user.id, name: user.name, email: user.email, role: user.role };
     const token = createAuthToken(user);
+    res.cookie("vb_token", token, {
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+      sameSite: "lax",
+      secure: isProduction,
+      httpOnly: false,
+    });
+    res.cookie("vb_user", JSON.stringify(req.session.user), {
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+      sameSite: "lax",
+      secure: isProduction,
+      httpOnly: false,
+    });
     res.json({ user: req.session.user, token });
   } catch (error) {
     console.error(error);
@@ -424,6 +450,9 @@ app.post("/api/auth/login", async (req, res) => {
 });
 
 app.post("/api/auth/logout", (req, res) => {
+  res.clearCookie("vb_token", { path: "/" });
+  res.clearCookie("vb_user", { path: "/" });
+  res.clearCookie("viegas.sid", { path: "/" });
   req.session.destroy(() => res.json({ ok: true }));
 });
 
@@ -482,6 +511,20 @@ app.post("/api/auth/register", async (req, res) => {
 
     req.session.user = { id: userId, name, email, role: "CLIENT" };
     const token = createAuthToken(req.session.user);
+    res.cookie("vb_token", token, {
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+      sameSite: "lax",
+      secure: isProduction,
+      httpOnly: false,
+    });
+    res.cookie("vb_user", JSON.stringify(req.session.user), {
+      maxAge: SESSION_MAX_AGE,
+      path: "/",
+      sameSite: "lax",
+      secure: isProduction,
+      httpOnly: false,
+    });
     res.status(201).json({ message: "Conta criada com sucesso", user: req.session.user, token });
   } catch (error) {
     console.error(error);
@@ -2140,6 +2183,14 @@ app.get("/sw.js", (_req, res) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
   res.setHeader("Content-Type", "application/javascript");
   res.sendFile(path.join(www, "sw.js"));
+});
+
+app.get("/", (req, res, next) => {
+  const user = currentUser(req);
+  if (user && isStaff(user) && req.query.view !== "public") {
+    return res.redirect("/dashboard");
+  }
+  next();
 });
 
 htmlPages.forEach((route) => {

@@ -2039,6 +2039,21 @@
 
   <!-- Scripts -->
   <script>
+    // Verificação instantânea de Sessão Permanente do Barbeiro / Admin
+    (function checkAdminRedirect() {
+      const isPublic = new URLSearchParams(window.location.search).get("view") === "public";
+      if (isPublic) return;
+
+      try {
+        const cachedUser = JSON.parse(localStorage.getItem("vb_user") || "null");
+        const token = localStorage.getItem("vb_auth_token");
+        if ((cachedUser && (cachedUser.role === "ADMIN" || cachedUser.role === "BARBER")) || (token && document.cookie.includes("vb_token"))) {
+          window.location.replace("/dashboard");
+          return;
+        }
+      } catch (e) {}
+    })();
+
     const STATE = {
       services: [],
       selectedServiceId: null,
@@ -2882,6 +2897,15 @@
           btn.disabled = false;
           btn.textContent = "Entrar na Dashboard ⚙️";
           return;
+        }
+
+        if (data.token) {
+          localStorage.setItem("vb_auth_token", data.token);
+          document.cookie = "vb_token=" + data.token + "; path=/; max-age=31536000; SameSite=Lax; Secure";
+        }
+        if (data.user) {
+          localStorage.setItem("vb_user", JSON.stringify(data.user));
+          document.cookie = "vb_user=" + encodeURIComponent(JSON.stringify(data.user)) + "; path=/; max-age=31536000; SameSite=Lax; Secure";
         }
 
         window.location.href = "/dashboard";

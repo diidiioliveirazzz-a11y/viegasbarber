@@ -157,10 +157,12 @@ const VB = (() => {
       btn.onclick = async () => {
         localStorage.removeItem("vb_auth_token");
         localStorage.removeItem("vb_user");
+        document.cookie = "vb_token=; path=/; max-age=0; SameSite=Lax";
+        document.cookie = "vb_user=; path=/; max-age=0; SameSite=Lax";
         try {
           await api("/api/auth/logout", { method: "POST" });
         } catch {}
-        location.href = "/";
+        location.href = "/?view=public";
       };
     });
     document.querySelectorAll("[data-bell]").forEach((btn) => {
@@ -1608,6 +1610,10 @@ const VB = (() => {
   }
 
   function pageLogin() {
+    if (user && (user.role === "ADMIN" || user.role === "BARBER")) {
+      window.location.replace("/dashboard");
+      return;
+    }
     let method = "instagram";
     const render = () => {
       authShell(
@@ -1640,9 +1646,11 @@ const VB = (() => {
           const data = await api("/api/auth/login", { method: "POST", body: { email: identifier, password: fd.get("password") } });
           if (data.token) {
             localStorage.setItem("vb_auth_token", data.token);
+            document.cookie = "vb_token=" + data.token + "; path=/; max-age=31536000; SameSite=Lax; Secure";
           }
           if (data.user) {
             localStorage.setItem("vb_user", JSON.stringify(data.user));
+            document.cookie = "vb_user=" + encodeURIComponent(JSON.stringify(data.user)) + "; path=/; max-age=31536000; SameSite=Lax; Secure";
           }
           location.href = data.user.role === "ADMIN" || data.user.role === "BARBER" ? "/dashboard" : "/";
         } catch (err) {
@@ -1656,6 +1664,10 @@ const VB = (() => {
   }
 
   function pageRegister() {
+    if (user && (user.role === "ADMIN" || user.role === "BARBER")) {
+      window.location.replace("/dashboard");
+      return;
+    }
     let method = "instagram";
     const render = () => {
       authShell(
@@ -1692,9 +1704,11 @@ const VB = (() => {
           });
           if (data.token) {
             localStorage.setItem("vb_auth_token", data.token);
+            document.cookie = "vb_token=" + data.token + "; path=/; max-age=31536000; SameSite=Lax; Secure";
           }
           if (data.user) {
             localStorage.setItem("vb_user", JSON.stringify(data.user));
+            document.cookie = "vb_user=" + encodeURIComponent(JSON.stringify(data.user)) + "; path=/; max-age=31536000; SameSite=Lax; Secure";
           }
           location.href = data.user.role === "ADMIN" || data.user.role === "BARBER" ? "/dashboard" : "/";
         } catch (err) {
@@ -2125,7 +2139,7 @@ const VB = (() => {
             <button type="button" class="btn btn-ghost" id="btn-admin-enable-notif" title="Notificações no Telemóvel" style="width:2.35rem;height:2.35rem;padding:0;display:inline-flex;align-items:center;justify-content:center;font-size:1.15rem;border-radius:50%">
               🔔
             </button>
-            <a class="btn btn-ghost" href="/" style="padding:.4rem .7rem;font-size:.78rem">Site público</a>
+            <a class="btn btn-ghost" href="/?view=public" style="padding:.4rem .7rem;font-size:.78rem">Site público</a>
             <button class="btn-ghost btn" data-logout style="padding:.4rem .7rem;font-size:.78rem">Sair</button>
           </div>
         </header>
@@ -2144,7 +2158,7 @@ const VB = (() => {
               </div>
               <nav>${links.map(([id, label]) => `<a class="${tab === id ? "active" : ""}" href="/dashboard?tab=${id}">${label}</a>`).join("")}</nav>
             </div>
-            <div><a class="btn btn-ghost" href="/">← Site público</a><p style="margin:.5rem 0">${user.name}<br><span class="chip" style="position:static">${user.role}</span></p><button class="btn-ghost btn" data-logout>Terminar sessão</button></div>
+            <div><a class="btn btn-ghost" href="/?view=public">← Site público</a><p style="margin:.5rem 0">${user.name}<br><span class="chip" style="position:static">${user.role}</span></p><button class="btn-ghost btn" data-logout>Terminar sessão</button></div>
           </aside>
           <main class="dash-main">${body}</main>
         </div>
@@ -2307,7 +2321,7 @@ const VB = (() => {
 
   async function boot(page) {
     if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js?v=20").then((reg) => {
+      navigator.serviceWorker.register("/sw.js?v=21").then((reg) => {
         reg.update();
       }).catch(() => {});
     }
