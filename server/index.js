@@ -1873,6 +1873,7 @@ app.post("/api/bairro/book", async (req, res) => {
     }
 
     const apptId = id();
+    console.log(`[NOVA_MARCAÇÃO] ${clientName} (${clientPhone}) marcou ${service.name} para ${date} às ${startTime}`);
     await db.appointments().insertOne({
       id: apptId,
       user_id: user.id,
