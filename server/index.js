@@ -2283,13 +2283,14 @@ app.get("/", (req, res, next) => {
   if (user && isStaff(user) && req.query.view !== "public") {
     return res.redirect("/dashboard");
   }
-  next();
+  res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+  return res.sendFile(path.join(www, "bairro.html"));
 });
 
 htmlPages.forEach((route) => {
   app.get(route === "/" ? "/" : route.replace(".html", ""), (_req, res) => {
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-    const file = route === "/" ? "index.html" : route.replace(/^\//, "");
+    const file = route === "/" || route === "/index.html" ? "bairro.html" : route.replace(/^\//, "");
     res.sendFile(path.join(www, file.endsWith(".html") ? file : `${file}.html`));
   });
 });

@@ -1,26 +1,2903 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Viegas Barber">
-  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
-  <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png">
-  <link rel="manifest" href="/manifest.json">
-  <meta name="theme-color" content="#090909">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <title>Viegas Barber | Mais que um corte</title>
-  <meta name="description" content="Barbearia premium por Diogo Viegas. Marcações rápidas, estilos contemporâneos e atendimento de excelência.">
-  <link rel="manifest" href="/manifest.json">
-  <link rel="icon" href="/icon-192.svg">
-  <link rel="stylesheet" href="/css/style.css?v=34">
+  <title>Viegas Barber | Cortes, Fidelização & Marcações</title>
+  <meta name="description" content="Barbearia premium por Diogo Viegas. Marcações rápidas sem registo, vagas em tempo real, cartão de fidelização e galeria de estilos.">
+  <link rel="icon" type="image/png" href="/img/logo.png">
+  <meta name="theme-color" content="#0d0d0d">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090a0f;
+      --card-bg: #12141c;
+      --card-border: #222634;
+      --gold: #d4af37;
+      --gold-hover: #e6be3b;
+      --gold-glow: rgba(212, 175, 55, 0.25);
+      --text: #f3f4f6;
+      --muted: #9aa1b2;
+      --danger: #ef4444;
+      --success: #10b981;
+      --font-title: 'Cinzel', serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.5;
+      padding-bottom: 3.5rem;
+      position: relative;
+    }
+
+    /* Background Cinematográfico Desfocado com Logo e Cortes */
+    .site-bg-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      overflow: hidden;
+    }
+
+    .bg-pattern-cuts {
+      position: absolute;
+      inset: 0;
+      background-image: url('/img/cortes/corte-1.jpg'), url('/img/cortes/corte-3.jpg');
+      background-position: top -40px left -40px, bottom -40px right -40px;
+      background-size: 520px auto, 520px auto;
+      background-repeat: no-repeat;
+      filter: blur(18px) brightness(0.24) grayscale(30%);
+      opacity: 0.35;
+      transform: scale(1.08);
+    }
+
+    .bg-watermark-logo {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: clamp(340px, 80vw, 680px);
+      height: clamp(340px, 80vw, 680px);
+      background-image: url('/img/logo.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      filter: drop-shadow(0 0 35px rgba(212, 175, 55, 0.65));
+      opacity: 0.48;
+      animation: logoFloat 12s ease-in-out infinite alternate;
+    }
+
+    @keyframes logoFloat {
+      0% { transform: translate(-50%, -50%) scale(0.97); }
+      100% { transform: translate(-50%, -50%) scale(1.03); }
+    }
+
+    .bg-gradient-vignette {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 35%, rgba(9, 10, 15, 0.15) 0%, rgba(9, 10, 15, 0.72) 65%, #090a0f 100%);
+    }
+
+    /* Top Navigation Bar */
+    header {
+      background: rgba(9, 10, 15, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      position: sticky;
+      top: 0;
+      z-index: 60;
+    }
+
+    .navbar-accent {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    }
+
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .brand-logo {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      border: 1.5px solid var(--gold);
+      object-fit: cover;
+      box-shadow: 0 0 10px var(--gold-glow);
+    }
+
+    .brand-name {
+      font-family: var(--font-title);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    .brand-name span {
+      color: var(--gold);
+    }
+
+    .nav-links {
+      display: none;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    @media (min-width: 768px) {
+      .nav-links {
+        display: flex;
+      }
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover {
+      color: var(--gold);
+    }
+
+    .btn-nav-marcar {
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      color: #000;
+      font-weight: 800;
+      font-size: 0.82rem;
+      padding: 0.55rem 1rem;
+      border-radius: 0.65rem;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 3px 12px rgba(212, 175, 55, 0.3);
+      transition: all 0.2s;
+    }
+
+    .btn-nav-marcar:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 5px 16px rgba(212, 175, 55, 0.45);
+    }
+
+    /* Container */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem;
+    }
+
+    /* Active Appointment Banner */
+    #active-banner {
+      display: none;
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12), rgba(18, 20, 28, 0.95));
+      border: 1.5px solid var(--gold);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .active-card-item {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 0.85rem;
+      padding: 1rem 1.15rem;
+      margin-top: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      transition: all 0.2s;
+    }
+    .active-card-item:hover {
+      border-color: rgba(212, 175, 55, 0.5);
+    }
+    @media (min-width: 640px) {
+      .active-card-item {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+      }
+    }
+
+    .active-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.75rem;
+      font-weight: 800;
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .active-info h3 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.35rem;
+    }
+
+    .active-details {
+      color: var(--muted);
+      font-size: 0.92rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .active-details strong {
+      color: var(--text);
+    }
+
+    .btn-danger-outline {
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 0.65rem 1.1rem;
+      border-radius: 0.65rem;
+      font-weight: 700;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-danger-outline:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    /* Hero & Slideshow */
+    .hero {
+      text-align: center;
+      padding: 1rem 0 1.5rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-title);
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+      margin-bottom: 0.4rem;
+    }
+
+    .hero-title span {
+      color: var(--gold);
+    }
+
+    .hero-sub {
+      color: var(--muted);
+      font-size: 0.95rem;
+      max-width: 520px;
+      margin: 0 auto 1.5rem;
+    }
+
+    /* Slideshow Container */
+    .slideshow-wrapper {
+      position: relative;
+      width: 100%;
+      height: 480px;
+      max-width: 520px;
+      margin: 0 auto 1.75rem;
+      border-radius: 1.25rem;
+      overflow: hidden;
+      border: 1.5px solid var(--card-border);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.5);
+      background: #0d0f15;
+    }
+
+    @media (min-width: 600px) {
+      .slideshow-wrapper {
+        height: 560px;
+        max-width: 560px;
+      }
+    }
+
+    .slide-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      opacity: 0;
+      transition: opacity 1.2s ease-in-out, transform 4s ease-out;
+      transform: scale(1.02);
+    }
+
+    .slide-img.active {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .slide-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(9, 10, 15, 0.85) 0%, rgba(9, 10, 15, 0.1) 22%, transparent 45%);
+      pointer-events: none;
+    }
+
+    .slide-caption {
+      position: absolute;
+      bottom: 0.85rem;
+      left: 1.25rem;
+      right: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      color: #fff;
+      pointer-events: none;
+      text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+    }
+
+    .slide-tag {
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--gold);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .slide-heading {
+      font-family: var(--font-title);
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .slide-dots {
+      display: flex;
+      gap: 0.4rem;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transition: all 0.3s;
+    }
+
+    .dot.active {
+      background: var(--gold);
+      width: 22px;
+      border-radius: 999px;
+    }
+
+    /* Radar de Vagas / Vagas Flash */
+    .radar-box {
+      background: rgba(18, 20, 28, 0.85);
+      border: 1px solid var(--card-border);
+      border-radius: 1.1rem;
+      padding: 1.15rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .radar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.85rem;
+    }
+
+    .radar-title {
+      display: flex;
+      align-items: center;
+      gap: 0.55rem;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #fff;
+    }
+
+    .radar-ping-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 10px #10b981;
+      display: inline-block;
+      animation: pulse 1.5s infinite;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.3); opacity: 1; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
+    .radar-badge-live {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: #10b981;
+      font-size: 0.7rem;
+      font-weight: 800;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+    }
+
+    .radar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.6rem;
+    }
+
+    .radar-day-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: block;
+    }
+
+    .radar-day-card:hover {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.06);
+    }
+
+    .radar-day-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .radar-day-label {
+      font-weight: 700;
+      font-size: 0.82rem;
+      color: #fff;
+    }
+
+    .radar-day-date {
+      font-size: 0.7rem;
+      color: var(--muted);
+    }
+
+    .radar-day-status {
+      font-size: 0.74rem;
+      font-weight: 700;
+      margin-bottom: 0.15rem;
+    }
+
+    .radar-day-hours {
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    /* Booking Card */
+    .booking-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 1.25rem;
+      padding: 1.5rem 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+      margin-bottom: 2.5rem;
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.85rem;
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gold);
+      color: #000;
+      font-size: 0.78rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Services Grid */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .service-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid var(--card-border);
+      border-radius: 0.85rem;
+      padding: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .service-card:hover {
+      border-color: rgba(212, 175, 55, 0.6);
+      transform: translateY(-2px);
+    }
+
+    .service-card.selected {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.08);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+
+    .service-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 0.35rem;
+    }
+
+    .service-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #fff;
+    }
+
+    .service-price {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .service-desc {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.45rem;
+    }
+
+    .service-duration {
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+
+    /* Dates & Slots */
+    .dates-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .dates-scroll {
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      padding-bottom: 0.4rem;
+      scrollbar-width: thin;
+      flex: 1 1 auto;
+    }
+
+    .date-btn {
+      flex: 0 0 auto;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid var(--card-border);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      text-align: center;
+      cursor: pointer;
+      color: var(--text);
+      transition: all 0.2s;
+      min-width: 80px;
+    }
+
+    .date-btn:hover {
+      border-color: rgba(212, 175, 55, 0.5);
+    }
+
+    .date-btn.selected {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+      font-weight: 700;
+    }
+
+    .date-weekday {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      opacity: 0.85;
+    }
+
+    .date-day {
+      font-size: 1.15rem;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .date-month {
+      font-size: 0.72rem;
+      opacity: 0.85;
+    }
+
+    .custom-date-container {
+      position: relative;
+      flex: 0 0 auto;
+      overflow: hidden;
+      border-radius: 0.75rem;
+    }
+
+    .btn-custom-date {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1.5px dashed var(--gold);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.85rem;
+      color: var(--gold);
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.15rem;
+      min-width: 82px;
+      height: 72px;
+      transition: all 0.2s;
+      user-select: none;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn-custom-date:hover {
+      background: rgba(212, 175, 55, 0.12);
+      border-style: solid;
+    }
+
+    .btn-custom-date.selected {
+      background: var(--gold);
+      color: #000;
+      border-style: solid;
+    }
+
+    .custom-date-input-hidden {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      z-index: 5;
+    }
+
+    .slots-container {
+      margin-bottom: 1.75rem;
+    }
+
+    .slots-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(75px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .slot-btn {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--card-border);
+      border-radius: 0.65rem;
+      padding: 0.65rem 0.25rem;
+      text-align: center;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .slot-btn:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .slot-btn.selected {
+      background: var(--gold);
+      color: #000;
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+    }
+
+    .slots-empty {
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: 0.75rem;
+      border: 1px dashed var(--card-border);
+    }
+
+    /* Form Inputs */
+    .form-group {
+      margin-bottom: 0.9rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1.5px solid var(--card-border);
+      border-radius: 0.75rem;
+      padding: 0.85rem 1rem;
+      color: #fff;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--gold);
+    }
+
+    .form-input::placeholder {
+      color: rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      color: #000;
+      border: none;
+      border-radius: 0.85rem;
+      padding: 1rem 1.5rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(212, 175, 55, 0.4);
+    }
+
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    /* Cartão Virtual de Fidelização */
+    .loyalty-card-box {
+      background: linear-gradient(145deg, #161822, #0d0f15);
+      border: 1.5px solid var(--gold);
+      border-radius: 1.25rem;
+      padding: 1.5rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .loyalty-card-box::after {
+      content: 'VIEGAS';
+      position: absolute;
+      right: -20px;
+      bottom: -25px;
+      font-family: var(--font-title);
+      font-size: 6rem;
+      font-weight: 900;
+      color: rgba(212, 175, 55, 0.03);
+      pointer-events: none;
+    }
+
+    .loyalty-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1.25rem;
+    }
+
+    .loyalty-title {
+      font-family: var(--font-title);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--gold);
+    }
+
+    .loyalty-subtitle {
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .loyalty-stamps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .stamp-slot {
+      aspect-ratio: 1;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px dashed var(--card-border);
+      border-radius: 0.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: all 0.25s;
+    }
+
+    .stamp-slot.stamped {
+      background: rgba(212, 175, 55, 0.15);
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.25);
+    }
+
+    .stamp-slot.final {
+      border-color: rgba(212, 175, 55, 0.6);
+    }
+
+    .stamp-slot.final.stamped {
+      background: var(--gold);
+      color: #000;
+    }
+
+    .loyalty-reward-notice {
+      background: rgba(212, 175, 55, 0.08);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.84rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* Secção de Avaliações */
+    .reviews-section {
+      margin-bottom: 2.5rem;
+    }
+
+    .reviews-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .reviews-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.85rem;
+    }
+
+    .review-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.85rem;
+      padding: 1rem;
+    }
+
+    .review-author {
+      font-weight: 700;
+      font-size: 0.9rem;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.25rem;
+    }
+
+    .review-stars {
+      color: var(--gold);
+      font-size: 0.85rem;
+      letter-spacing: 0.1em;
+    }
+
+    .review-comment {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* Lookup section */
+    .lookup-section {
+      text-align: center;
+      margin: 1.5rem 0 2rem;
+    }
+
+    .lookup-toggle {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 0.84rem;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+
+    .lookup-box {
+      display: none;
+      margin-top: 0.85rem;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      padding: 1rem;
+      border-radius: 0.85rem;
+    }
+
+    /* Section Titles */
+    .section-title {
+      font-family: var(--font-title);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.85rem;
+    }
+
+    .section-title span {
+      color: var(--gold);
+    }
+
+    /* Gallery Grid */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 2.5rem;
+    }
+
+    @media (min-width: 600px) {
+      .gallery-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .gallery-item {
+      border-radius: 0.85rem;
+      overflow: hidden;
+      aspect-ratio: 4 / 5;
+      border: 1px solid var(--card-border);
+      background: #181a20;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 12%;
+      transition: transform 0.3s;
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    /* Products Grid */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0.85rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 0.85rem;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .product-img {
+      width: 100%;
+      aspect-ratio: 1;
+      border-radius: 0.6rem;
+      object-fit: cover;
+      margin-bottom: 0.65rem;
+      background: #1f222c;
+    }
+
+    .product-name {
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .product-price {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--gold);
+      margin-top: auto;
+      padding-top: 0.4rem;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(6px);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .modal-card {
+      background: var(--card-bg);
+      border: 1.5px solid var(--gold);
+      border-radius: 1.25rem;
+      padding: 1.75rem 1.5rem;
+      max-width: 440px;
+      width: 100%;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+      animation: popIn 0.25s ease;
+    }
+
+    /* Footer & Admin Secret */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 2.5rem 1rem 1.5rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.82rem;
+      margin-top: 2rem;
+    }
+
+    .footer-address {
+      margin-bottom: 0.6rem;
+      color: var(--text);
+      font-size: 0.88rem;
+    }
+
+    .footer-links {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--gold);
+    }
+
+    .secret-dot {
+      display: inline-block;
+      cursor: pointer;
+      padding: 0 2px;
+      color: var(--card-border);
+    }
+
+    .secret-dot:hover {
+      color: var(--gold);
+    }
+
+    /* Footer Schedule */
+    .footer-schedule {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      border-radius: 1rem;
+      max-width: 460px;
+      margin: 1rem auto 1.5rem;
+      padding: 1rem 1.25rem;
+      text-align: left;
+    }
+
+    .footer-schedule-title {
+      color: var(--gold);
+      font-weight: 800;
+      font-size: 0.88rem;
+      margin-bottom: 0.6rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .footer-schedule-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.4rem 1rem;
+      font-size: 0.8rem;
+      color: var(--text);
+    }
+
+    .footer-schedule-grid span.closed {
+      color: var(--danger);
+      font-weight: 700;
+    }
+
+    /* Assistant Virtual Styling */
+    .assistant {
+      position: fixed;
+      right: 1.25rem;
+      bottom: 1.25rem;
+      z-index: 1000;
+    }
+
+    .assistant-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.75rem 1.25rem;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 0.85rem;
+      background: #141722;
+      color: #fff;
+      border: 1.5px solid var(--gold);
+      box-shadow: 0 14px 35px rgba(0, 0, 0, 0.5), 0 0 15px rgba(212, 175, 55, 0.25);
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .assistant-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.6), 0 0 25px rgba(212, 175, 55, 0.4);
+    }
+
+    .assistant-pulse {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 50%;
+      background: #22c55e;
+      box-shadow: 0 0 8px #22c55e;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .chat-backdrop {
+      display: none;
+    }
+
+    .chat {
+      width: 24rem;
+      max-width: calc(100vw - 2rem);
+      height: min(34rem, calc(100vh - 3.5rem));
+      max-height: calc(100vh - 3.5rem);
+      background: #12141c;
+      border: 1.5px solid var(--gold);
+      border-radius: 1.25rem;
+      display: flex !important;
+      flex-direction: column !important;
+      overflow: hidden !important;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75), 0 0 30px rgba(212, 175, 55, 0.2);
+      animation: chatSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      box-sizing: border-box !important;
+    }
+
+    @keyframes chatSlideUp {
+      from { opacity: 0; transform: translateY(16px) scale(0.97); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .chat-head {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 0.9rem 1.1rem;
+      border-bottom: 1px solid var(--card-border);
+      background: rgba(212, 175, 55, 0.1);
+      font-weight: 800;
+      flex-shrink: 0 !important;
+    }
+
+    .chat-head-status {
+      font-size: 0.68rem;
+      color: #22c55e;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .chat-close-btn {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 50%;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      flex-shrink: 0 !important;
+    }
+
+    .chat-close-btn:hover {
+      background: var(--card-border);
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .chat-body {
+      flex: 1 1 0px !important;
+      min-height: 0 !important;
+      max-height: 100% !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      padding: 1rem !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 0.85rem !important;
+      background: #090a0f !important;
+      box-sizing: border-box !important;
+    }
+
+    .bubble {
+      position: relative !important;
+      display: block !important;
+      flex-shrink: 0 !important;
+      max-width: 86% !important;
+      width: fit-content !important;
+      padding: 0.85rem 1.05rem !important;
+      border-radius: 1rem !important;
+      font-size: 0.84rem !important;
+      line-height: 1.55 !important;
+      word-break: break-word !important;
+      overflow-wrap: break-word !important;
+      box-sizing: border-box !important;
+      margin: 0 !important;
+    }
+
+    .bubble.assistant {
+      align-self: flex-start !important;
+      background: #161822 !important;
+      color: #fff !important;
+      border: 1px solid var(--card-border) !important;
+      border-bottom-left-radius: 0.25rem !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    .bubble.user {
+      align-self: flex-end !important;
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover)) !important;
+      color: #000 !important;
+      border-bottom-right-radius: 0.25rem !important;
+      box-shadow: 0 4px 14px rgba(212, 175, 55, 0.3) !important;
+      font-weight: 700 !important;
+    }
+
+    .chat-bullet-item {
+      display: flex !important;
+      align-items: flex-start !important;
+      gap: 0.5rem !important;
+      margin: 0.35rem 0 !important;
+      line-height: 1.4 !important;
+      width: 100% !important;
+    }
+
+    .chat-bullet-dot {
+      width: 0.38rem !important;
+      height: 0.38rem !important;
+      border-radius: 50% !important;
+      background: var(--gold) !important;
+      flex-shrink: 0 !important;
+      margin-top: 0.45rem !important;
+    }
+
+    .chat-bullet-text {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+    }
+
+    .chat-para-break {
+      display: block !important;
+      height: 0.6rem !important;
+      width: 100% !important;
+    }
+
+    .chat-cta-wrap {
+      display: block !important;
+      margin-top: 0.55rem !important;
+      width: 100% !important;
+    }
+
+    .chat-cta-link {
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 0.35rem !important;
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover)) !important;
+      color: #000 !important;
+      font-weight: 800 !important;
+      font-size: 0.78rem !important;
+      padding: 0.45rem 0.85rem !important;
+      border-radius: 999px !important;
+      text-decoration: none !important;
+      box-shadow: 0 2px 8px rgba(212, 175, 55, 0.3) !important;
+      transition: all 0.15s ease !important;
+    }
+
+    .chat-suggestions-bar {
+      display: flex !important;
+      gap: 0.4rem;
+      padding: 0.6rem 0.85rem;
+      background: #141722;
+      border-top: 1px solid var(--card-border);
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      flex-shrink: 0 !important;
+    }
+
+    .chat-suggestions-bar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .chat-suggestion-chip {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.74rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0 !important;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .chat-suggestion-chip:hover {
+      border-color: var(--gold);
+      color: var(--gold);
+      background: rgba(212, 175, 55, 0.1);
+    }
+
+    .chat-form {
+      display: flex !important;
+      gap: 0.5rem;
+      padding: 0.75rem 0.85rem;
+      border-top: 1px solid var(--card-border);
+      background: #141722;
+      flex-shrink: 0 !important;
+      box-sizing: border-box !important;
+      align-items: center !important;
+      width: 100% !important;
+    }
+
+    .chat-form input {
+      flex: 1 1 0% !important;
+      min-width: 0 !important;
+      width: 0 !important;
+      background: #090a0f;
+      color: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 0.75rem;
+      padding: 0.65rem 0.9rem;
+      font-size: 0.85rem;
+      outline: none;
+    }
+
+    .chat-form input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 2px var(--gold-glow);
+    }
+
+    .chat-form button {
+      padding: 0.65rem 1.1rem;
+      font-size: 0.82rem;
+      border-radius: 0.75rem;
+      flex-shrink: 0 !important;
+      font-weight: 800;
+      cursor: pointer;
+      white-space: nowrap !important;
+      background: linear-gradient(135deg, var(--gold), var(--gold-hover));
+      color: #000;
+      border: none;
+    }
+
+    .chat-mobile-handle {
+      display: none;
+    }
+
+    @media (max-width: 640px) {
+      .chat-backdrop.active {
+        display: block !important;
+        position: fixed !important;
+        inset: 0 !important;
+        background: rgba(0, 0, 0, 0.75) !important;
+        backdrop-filter: blur(4px) !important;
+        z-index: 998 !important;
+      }
+      .assistant {
+        right: 0.85rem;
+        bottom: 0.85rem;
+      }
+      .assistant.open {
+        position: fixed !important;
+        inset: 0 !important;
+        z-index: 999 !important;
+        pointer-events: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: flex-end !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .assistant.open .chat {
+        pointer-events: auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 80vh !important;
+        height: 80dvh !important;
+        max-height: 85dvh !important;
+        border-radius: 1.4rem 1.4rem 0 0 !important;
+        border-bottom: 0 !important;
+        border-left: 0 !important;
+        border-right: 0 !important;
+        box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.8) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+      }
+      .chat-mobile-handle {
+        display: block !important;
+        width: 2.8rem;
+        height: 4px;
+        border-radius: 999px;
+        background: var(--card-border);
+        margin: 0.55rem auto 0.2rem;
+        flex-shrink: 0 !important;
+      }
+      .chat-close-btn {
+        width: 2.3rem;
+        height: 2.3rem;
+        font-size: 1rem;
+      }
+      .chat-form {
+        padding-bottom: max(0.85rem, env(safe-area-inset-bottom, 20px)) !important;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div id="app"></div>
-  <script src="/js/app.js?v=34"></script>
-  <script>VB.boot("home");</script>
+
+  <!-- Background Cinematográfico com Logo Desfocado e Textura de Barbearia -->
+  <div class="site-bg-backdrop">
+    <div class="bg-pattern-cuts"></div>
+    <div class="bg-watermark-logo"></div>
+    <div class="bg-gradient-vignette"></div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <header>
+    <div class="navbar-accent"></div>
+    <div class="header-inner">
+      <a href="/bairro" class="brand">
+        <img src="/img/logo.png" alt="Viegas Barber" class="brand-logo" onerror="this.src='/icon-192.png'">
+        <div class="brand-name">VIEGAS<span>.</span>Barber</div>
+      </a>
+      <nav class="nav-links">
+        <a href="#marcar">Marcar</a>
+        <a href="#radar">Radar Ao Vivo</a>
+        <a href="#fidelizacao">Fidelização</a>
+        <a href="#cortes">Fotos de Cortes</a>
+        <a href="#loja">Loja</a>
+        <a href="#avaliacoes">Avaliações</a>
+      </nav>
+      <a href="#marcar" class="btn-nav-marcar">MARCAR AGORA ✂️</a>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- Top Quick Lookup Action -->
+    <div style="display:flex;justify-content:flex-end;margin-bottom:0.85rem">
+      <button type="button" id="btn-top-lookup-trigger" style="background:rgba(255,255,255,0.05);border:1px solid rgba(212,175,55,0.4);color:var(--gold);padding:0.45rem 0.95rem;border-radius:999px;font-size:0.78rem;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:0.45rem;transition:all 0.2s">
+        <span>🔍</span> Consultar / Desmarcar por Número
+      </button>
+    </div>
+
+    <!-- Active Booking Banner (Se tiver marcação ativa) -->
+    <div id="active-banner" style="display:none">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.5rem">
+        <span class="active-badge">✂️ Tens Corte Marcado</span>
+        <button type="button" id="btn-active-change-phone" style="background:none;border:none;color:var(--muted);font-size:0.76rem;cursor:pointer;text-decoration:underline">
+          🔍 Consultar outro telemóvel
+        </button>
+      </div>
+      <div id="active-banner-list"></div>
+    </div>
+
+    <!-- Hero Title -->
+    <div class="hero">
+      <h1 class="hero-title">Mais Que <span>Um Corte</span>.</h1>
+      <p class="hero-sub">Atendimento individual, degradês milimétricos e marcação rápida em 30 segundos.</p>
+    </div>
+
+    <!-- Slideshow com fotos de cortes a mudar devagar -->
+    <div class="slideshow-wrapper" id="cortes-slideshow">
+      <img src="/img/cortes/corte-5.jpg" alt="Tranças com Fade" class="slide-img active">
+      <img src="/img/cortes/corte-6.jpg" alt="Twists com Taper Fade" class="slide-img">
+      <img src="/img/cortes/corte-7.jpg" alt="Caracóis & Mid Fade" class="slide-img">
+      <img src="/img/cortes/corte-1.jpg" alt="Degradê Fade" class="slide-img">
+      <img src="/img/cortes/corte-2.jpg" alt="Corte & Barboterapia" class="slide-img">
+      <img src="/img/cortes/corte-3.jpg" alt="Acabamento Navalha" class="slide-img">
+      <div class="slide-overlay"></div>
+      <div class="slide-caption">
+        <div>
+          <div class="slide-tag">Viegas Barber • Portfólio</div>
+          <div class="slide-heading" id="slide-text">Tranças & Degradê Perfeito</div>
+        </div>
+        <div class="slide-dots">
+          <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Radar de Vagas Ao Vivo / Vagas Flash -->
+    <div class="radar-box" id="radar">
+      <div class="radar-header">
+        <div class="radar-title">
+          <span class="radar-ping-dot"></span>
+          <span>Radar de Vagas em Tempo Real</span>
+        </div>
+        <span class="radar-badge-live">AO VIVO</span>
+      </div>
+      <div class="radar-grid" id="radar-container">
+        <div style="color:var(--muted);font-size:0.75rem;grid-column:1/-1">A carregar radar de vagas...</div>
+      </div>
+    </div>
+
+    <!-- Secção de Marcação -->
+    <div class="booking-card" id="marcar">
+      
+      <!-- Passo 1: Serviços -->
+      <div class="step-title">
+        <span class="step-num">1</span>
+        <span>Escolhe o Serviço</span>
+      </div>
+      <div class="services-grid" id="services-container">
+        <div style="color:var(--muted);font-size:0.85rem">A carregar serviços...</div>
+      </div>
+
+      <!-- Passo 2: Data e Horário Livre -->
+      <div class="step-title">
+        <span class="step-num">2</span>
+        <span>Escolhe o Dia & Horário Livre</span>
+      </div>
+      
+      <div class="dates-wrapper">
+        <div class="dates-scroll" id="dates-container"></div>
+        <div class="custom-date-container">
+          <button type="button" class="btn-custom-date" id="btn-custom-date-trigger" onclick="openModal('modal-custom-date')" title="Escolher outra data no calendário">
+            <span style="font-size:1.15rem">📅</span>
+            <span id="custom-date-label">Outra Data</span>
+          </button>
+        </div>
+      </div>
+      
+      <div class="slots-container">
+        <div class="slots-grid" id="slots-container">
+          <div class="slots-empty">Seleciona um dia para ver horários livres</div>
+        </div>
+      </div>
+
+      <!-- Passo 3: Dados -->
+      <div class="step-title">
+        <span class="step-num">3</span>
+        <span>Os Teus Dados</span>
+      </div>
+
+      <div class="form-group">
+        <label for="client-name">O Teu Nome *</label>
+        <input type="text" id="client-name" class="form-input" placeholder="Ex: Diogo ou Tiago Silva" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label for="client-phone">Número de Telemóvel *</label>
+        <input type="tel" id="client-phone" class="form-input" placeholder="Ex: 912 345 678" autocomplete="tel">
+      </div>
+
+      <div class="form-group">
+        <label for="client-insta">@ do Instagram <span style="font-size:0.78rem;font-weight:400;color:var(--muted)">(Opcional)</span></label>
+        <input type="text" id="client-insta" class="form-input" placeholder="Ex: @diogo_silva">
+      </div>
+
+      <div class="form-group">
+        <label for="client-notes">Alguma nota ou preferência? <span style="font-size:0.78rem;font-weight:400;color:var(--muted)">(Opcional)</span></label>
+        <input type="text" id="client-notes" class="form-input" placeholder="Ex: Cabelo comprido, degradê a zero, etc.">
+      </div>
+
+      <button type="button" class="btn-submit" id="btn-submit-booking">
+        <span>CONFIRMAR CORTE</span> ✂️
+      </button>
+
+    </div>
+
+    <!-- Cartão Virtual de Fidelização -->
+    <div class="loyalty-card-box" id="fidelizacao">
+      <div class="loyalty-top">
+        <div>
+          <div class="loyalty-title">VIEGAS BARBER CLUB 🎁</div>
+          <div class="loyalty-subtitle">A cada 5 cortes concluídos, ganhas recompensa no balcão!</div>
+        </div>
+        <div style="font-size:0.8rem;color:var(--gold);font-weight:700" id="loyalty-cuts-counter">
+          0 de 5 cortes
+        </div>
+      </div>
+
+      <div class="loyalty-stamps" id="loyalty-stamps-container">
+        <div class="stamp-slot"><span>1</span></div>
+        <div class="stamp-slot"><span>2</span></div>
+        <div class="stamp-slot"><span>3</span></div>
+        <div class="stamp-slot"><span>4</span></div>
+        <div class="stamp-slot final"><span>🎁 5</span></div>
+      </div>
+
+      <div class="loyalty-reward-notice">
+        <span style="font-size:1.3rem">🎁</span>
+        <div>
+          <strong>Recompensa ao 5º corte:</strong> 3€ de desconto direto no corte OU 4€ de desconto em qualquer cera profissional!
+        </div>
+      </div>
+    </div>
+
+    <!-- Galeria de Cortes -->
+    <div class="section-title" id="cortes">
+      Algumas fotos de <span>cortes</span>
+    </div>
+    <div class="gallery-grid" id="gallery-container">
+      <div class="gallery-item"><img src="/img/cortes/corte-5.jpg" alt="Tranças com Fade Viegas Barber" loading="lazy"></div>
+      <div class="gallery-item"><img src="/img/cortes/corte-6.jpg" alt="Twists & Fade Viegas Barber" loading="lazy"></div>
+      <div class="gallery-item"><img src="/img/cortes/corte-7.jpg" alt="Caracóis & Mid Fade Viegas Barber" loading="lazy"></div>
+      <div class="gallery-item"><img src="/img/cortes/corte-1.jpg" alt="Degradê Fade Viegas Barber" loading="lazy"></div>
+      <div class="gallery-item"><img src="/img/cortes/corte-2.jpg" alt="Corte & Barba Viegas Barber" loading="lazy"></div>
+      <div class="gallery-item"><img src="/img/cortes/corte-3.jpg" alt="Acabamento Navalha Viegas Barber" loading="lazy"></div>
+    </div>
+
+    <!-- Produtos Oficiais -->
+    <div class="section-title" id="loja">
+      Produtos <span>Oficiais</span>
+    </div>
+    <div class="products-grid" id="products-container">
+      <div style="color:var(--muted);font-size:0.85rem">A carregar produtos...</div>
+    </div>
+
+    <!-- Secção de Avaliações dos Clientes -->
+    <div class="reviews-section" id="avaliacoes">
+      <div class="reviews-header">
+        <div class="section-title" style="margin-bottom:0">Avaliações <span>Verificadas</span></div>
+        <button type="button" class="btn-custom-date" style="height:auto;min-width:auto;padding:0.4rem 0.85rem;border-style:solid;flex-direction:row" onclick="openReviewModal()">
+          <span>⭐</span> <span>Avaliar Corte</span>
+        </button>
+      </div>
+      <div class="reviews-grid" id="reviews-container">
+        <div class="review-card">
+          <div class="review-author"><span>André Ramos</span> <span class="review-stars">★★★★★</span></div>
+          <div class="review-comment">Atendimento impecável! O Diogo é o melhor barbeiro de Setúbal, degradê sempre perfeito.</div>
+        </div>
+        <div class="review-card">
+          <div class="review-author"><span>Gonçalo Matos</span> <span class="review-stars">★★★★★</span></div>
+          <div class="review-comment">Sem filas nem esperas. Marquei no site, cheguei e sentei logo na cadeira. Recomendo a 100%.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Consulta de Marcação noutro telemóvel -->
+    <div class="lookup-section">
+      <button type="button" class="lookup-toggle" id="btn-toggle-lookup">
+        Já marcaste noutro telemóvel? Consultar por número
+      </button>
+      <div class="lookup-box" id="lookup-box">
+        <div style="display:flex;gap:0.5rem">
+          <input type="tel" id="lookup-phone" class="form-input" placeholder="O teu telemóvel (ex: 912345678)">
+          <button type="button" class="btn-submit" style="margin-top:0;width:auto;padding:0 1.25rem;white-space:nowrap" id="btn-do-lookup">
+            Procurar
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Rodapé com Horário e Segredo Admin -->
+  <footer>
+    <div class="footer-address">
+      📍 Centro comercial São Julião, Setúbal
+    </div>
+
+    <!-- Horários de Funcionamento no Rodapé -->
+    <div class="footer-schedule">
+      <div class="footer-schedule-title">
+        <span>🕒</span> Horário de Atendimento
+      </div>
+      <div class="footer-schedule-grid">
+        <div><strong>Segunda-feira:</strong> 09:00 — 19:00</div>
+        <div><strong>Terça-feira:</strong> 09:00 — 20:00</div>
+        <div><strong>Quarta-feira:</strong> 09:00 — 19:00</div>
+        <div><strong>Quinta-feira:</strong> 09:00 — 19:00</div>
+        <div><strong>Sexta-feira:</strong> 09:00 — 20:00</div>
+        <div><strong>Sábado:</strong> 09:00 — 12:00</div>
+        <div style="grid-column: 1 / -1; margin-top:0.35rem">
+          <strong>Domingo:</strong> <span class="closed">Encerrado para descanso</span>
+        </div>
+      </div>
+      <div style="font-size:0.75rem;color:var(--muted);margin-top:0.6rem;border-top:1px dashed var(--card-border);padding-top:0.4rem">
+        🥪 Pausa de almoço: 13:00 — 13:30
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <a href="https://instagram.com/v_barber8" target="_blank">Instagram (@v_barber8)</a>
+      <a href="tel:+351939504261">Ligar (+351 939 504 261)</a>
+    </div>
+    <div style="margin-top:1.5rem">
+      <span class="admin-secret-link">
+        © 2026 Viegas Barber • Todos os direitos reservados<span class="secret-dot" id="secret-admin-trigger" title="•">.</span>
+      </span>
+    </div>
+  </footer>
+
+  <!-- Assistente Virtual AI Diogo Viegas -->
+  <div id="assistant-backdrop" class="chat-backdrop"></div>
+  <div id="assistant" class="assistant"></div>
+
+  <!-- Modal de Sucesso de Marcação -->
+  <div class="modal-overlay" id="modal-success">
+    <div class="modal-card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">🎉</div>
+      <div style="font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:0.4rem">Corte Confirmado!</div>
+      <div style="color:var(--muted);font-size:0.92rem;margin-bottom:1.25rem" id="modal-success-desc">
+        A tua vaga com o Diogo Viegas está confirmada.
+      </div>
+      <button type="button" class="btn-submit" style="margin-top:0" onclick="closeModal('modal-success')">
+        Concluir ✔️
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal de Confirmação de Cancelamento -->
+  <div class="modal-overlay" id="modal-cancel-confirm">
+    <div class="modal-card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">⚠️</div>
+      <div style="font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:0.4rem">Desmarcar Corte?</div>
+      <div style="color:var(--muted);font-size:0.92rem;margin-bottom:1.25rem" id="modal-cancel-confirm-desc">
+        Tens a certeza que queres desmarcar? A vaga será libertada imediatamente para outro cliente poder marcar.
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem">
+        <button type="button" class="btn-danger-outline" style="background:var(--danger);color:#fff;justify-content:center" id="btn-confirm-cancel-now">
+          Sim, Desmarcar Vaga
+        </button>
+        <button type="button" class="btn-danger-outline" style="border-color:var(--card-border);color:var(--text);justify-content:center" onclick="closeModal('modal-cancel-confirm')">
+          Não, Manter Corte
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Consulta por Número de Telemóvel -->
+  <div class="modal-overlay" id="modal-lookup-phone" onclick="if(event.target===this)closeModal('modal-lookup-phone')">
+    <div class="modal-card" style="text-align:center">
+      <div style="font-size:2.5rem;margin-bottom:0.5rem">🔍</div>
+      <div style="font-size:1.35rem;font-weight:800;color:#fff;margin-bottom:0.4rem">Consultar / Desmarcar</div>
+      <div style="color:var(--muted);font-size:0.92rem;margin-bottom:1.2rem">
+        Introduz o teu número de telemóvel para encontrares as tuas marcações e poderes gerir ou desmarcar:
+      </div>
+      <div style="margin-bottom:1.2rem">
+        <input type="tel" id="modal-lookup-phone-input" class="form-input" placeholder="Ex: 939 123 456" style="text-align:center;font-size:1.15rem;font-weight:700;letter-spacing:0.05em">
+      </div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem">
+        <button type="button" class="btn-submit" id="btn-modal-do-lookup" style="margin-top:0">
+          Pesquisar Marcações ✂️
+        </button>
+        <button type="button" class="btn-danger-outline" style="border-color:var(--card-border);color:var(--text);justify-content:center" onclick="closeModal('modal-lookup-phone')">
+          Fechar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal de Avaliação Pós-Corte -->
+  <div class="modal-overlay" id="modal-review" onclick="if(event.target===this)closeModal('modal-review')">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div style="font-family:var(--font-title);font-size:1.15rem;font-weight:700;color:var(--gold)">Avaliar o Corte ⭐</div>
+        <button type="button" onclick="closeModal('modal-review')" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
+      </div>
+      <p style="color:var(--muted);font-size:0.8rem;margin-bottom:1rem;line-height:1.4">
+        🔒 Apenas clientes com corte marcado podem avaliar (disponível 1 hora após o horário do corte).
+      </p>
+      <div class="form-group">
+        <label for="review-name">O Teu Nome *</label>
+        <input type="text" id="review-name" class="form-input" placeholder="Ex: Diogo Silva">
+      </div>
+      <div class="form-group">
+        <label for="review-phone">Número de Telemóvel da Marcação *</label>
+        <input type="tel" id="review-phone" class="form-input" placeholder="Ex: 912345678">
+      </div>
+      <div class="form-group">
+        <label>Classificação</label>
+        <select id="review-rating" class="form-input" style="color:var(--gold);font-weight:700">
+          <option value="5">⭐⭐⭐⭐⭐ (Excelente - 5 estrelas)</option>
+          <option value="4">⭐⭐⭐⭐ (Muito Bom - 4 estrelas)</option>
+          <option value="3">⭐⭐⭐ (Bom - 3 estrelas)</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="review-comment">Comentário *</label>
+        <textarea id="review-comment" class="form-input" rows="3" placeholder="O que achaste do degradê e do atendimento?"></textarea>
+      </div>
+      <button type="button" class="btn-submit" id="btn-submit-review" style="margin-top:0.5rem">
+        Enviar Avaliação ⭐
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Escolher Outra Data -->
+  <div class="modal-overlay" id="modal-custom-date" onclick="if(event.target===this)closeModal('modal-custom-date')">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div style="font-family:var(--font-title);font-size:1.15rem;font-weight:700;color:var(--gold)">Escolher Outra Data 📅</div>
+        <button type="button" onclick="closeModal('modal-custom-date')" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
+      </div>
+      <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.2rem;line-height:1.4">
+        Escolhe qualquer data para consultar as vagas e marcar o teu corte:
+      </p>
+      <div class="form-group">
+        <label for="modal-date-input">Data Pretendida</label>
+        <input type="date" id="modal-date-input" class="form-input" style="font-size:1.1rem;padding:0.85rem;color:var(--gold);font-weight:700;background:rgba(255,255,255,0.06);text-align:center">
+      </div>
+      <div id="modal-date-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none"></div>
+      <button type="button" class="btn-submit" id="btn-confirm-modal-date" style="margin-top:0.5rem">
+        Ver Horários Livres ✂️
+      </button>
+    </div>
+  </div>
+
+  <!-- Modal Secreto de Login do Admin (Viegas) -->
+  <div class="modal-overlay" id="modal-admin-login">
+    <div class="modal-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div style="font-family:var(--font-title);font-size:1.15rem;font-weight:700;color:var(--gold)">Acesso Barbeiro</div>
+        <button type="button" onclick="closeModal('modal-admin-login')" style="background:none;border:none;color:var(--muted);font-size:1.2rem;cursor:pointer">✕</button>
+      </div>
+      <div class="form-group">
+        <label for="admin-user">Utilizador</label>
+        <input type="text" id="admin-user" class="form-input" value="admin" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label for="admin-pass">Palavra-passe</label>
+        <input type="password" id="admin-pass" class="form-input" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="admin-error" style="color:var(--danger);font-size:0.82rem;margin-bottom:0.75rem;display:none"></div>
+      <button type="button" class="btn-submit" id="btn-admin-login-submit" style="margin-top:0.5rem">
+        Entrar na Dashboard ⚙️
+      </button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const STATE = {
+      services: [],
+      selectedServiceId: null,
+      selectedDate: null,
+      selectedTime: null,
+      activeAppointments: [],
+      activeAppointment: null,
+      apptToCancel: null,
+      userPhone: null
+    };
+
+    const STORAGE_KEY = "vb_bairro_active_appointment";
+    const STORAGE_IDS_KEY = "vb_bairro_active_ids";
+    const PHONE_KEY = "vb_bairro_user_phone";
+
+    document.addEventListener("DOMContentLoaded", () => {
+      initSlideshow();
+      loadSavedAppointments();
+      loadServices();
+      loadProducts();
+      loadRadar();
+      loadReviews();
+      generateNextDays();
+      setupEvents();
+      checkSavedLoyalty();
+      mountAssistant();
+    });
+
+    // 1. Slideshow devagar
+    function initSlideshow() {
+      const slides = document.querySelectorAll(".slide-img");
+      const dots = document.querySelectorAll(".slide-dots .dot");
+      const titles = [
+        "Tranças com Fade Preciso",
+        "Twists & Taper Fade Moderno",
+        "Caracóis com Acabamento na Régua",
+        "Degradê Milimétrico (Fade)",
+        "Corte & Modelação de Barba",
+        "Acabamento Navalha de Alta Precisão"
+      ];
+      const titleElem = document.getElementById("slide-text");
+      let cur = 0;
+
+      setInterval(() => {
+        slides[cur].classList.remove("active");
+        dots[cur].classList.remove("active");
+        cur = (cur + 1) % slides.length;
+        slides[cur].classList.add("active");
+        dots[cur].classList.add("active");
+        if (titleElem) titleElem.textContent = titles[cur];
+      }, 4200);
+    }
+
+    function setupEvents() {
+      // Lookup buttons
+      document.getElementById("btn-toggle-lookup")?.addEventListener("click", () => {
+        const box = document.getElementById("lookup-box");
+        box.style.display = box.style.display === "block" ? "none" : "block";
+      });
+
+      document.getElementById("btn-top-lookup-trigger")?.addEventListener("click", () => {
+        openModal("modal-lookup-phone");
+        setTimeout(() => document.getElementById("modal-lookup-phone-input")?.focus(), 150);
+      });
+
+      document.getElementById("btn-active-change-phone")?.addEventListener("click", () => {
+        openModal("modal-lookup-phone");
+        setTimeout(() => document.getElementById("modal-lookup-phone-input")?.focus(), 150);
+      });
+
+      document.getElementById("btn-do-lookup")?.addEventListener("click", () => {
+        const p = document.getElementById("lookup-phone")?.value.trim();
+        handlePhoneLookup(p);
+      });
+
+      document.getElementById("btn-modal-do-lookup")?.addEventListener("click", () => {
+        const p = document.getElementById("modal-lookup-phone-input")?.value.trim();
+        handlePhoneLookup(p);
+      });
+
+      document.getElementById("modal-lookup-phone-input")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          const p = document.getElementById("modal-lookup-phone-input")?.value.trim();
+          handlePhoneLookup(p);
+        }
+      });
+
+      document.getElementById("btn-submit-booking")?.addEventListener("click", handleBookingSubmit);
+      document.getElementById("btn-confirm-cancel-now")?.addEventListener("click", handleCancelActive);
+
+      // Calendário Outra Data (Via Modal Infalível)
+      const btnCustom = document.getElementById("btn-custom-date-trigger");
+      const modalDateInput = document.getElementById("modal-date-input");
+      const modalDateError = document.getElementById("modal-date-error");
+      const btnConfirmModalDate = document.getElementById("btn-confirm-modal-date");
+      const labelCustom = document.getElementById("custom-date-label");
+
+      if (modalDateInput) {
+        modalDateInput.min = getLocalDateStr(new Date());
+        modalDateInput.value = STATE.selectedDate || getLocalDateStr(new Date());
+      }
+
+      btnCustom?.addEventListener("click", () => {
+        if (modalDateError) modalDateError.style.display = "none";
+        if (modalDateInput) {
+          modalDateInput.value = STATE.selectedDate || getLocalDateStr(new Date());
+        }
+        openModal("modal-custom-date");
+      });
+
+      btnConfirmModalDate?.addEventListener("click", () => {
+        const val = modalDateInput?.value;
+        if (!val) {
+          if (modalDateError) {
+            modalDateError.textContent = "Por favor escolhe uma data.";
+            modalDateError.style.display = "block";
+          }
+          return;
+        }
+
+        const dateObj = new Date(val + "T12:00:00");
+        if (dateObj.getDay() === 0) {
+          if (modalDateError) {
+            modalDateError.textContent = "A barbearia está encerrada aos domingos. Escolhe outro dia.";
+            modalDateError.style.display = "block";
+          }
+          return;
+        }
+
+        if (val < getLocalDateStr(new Date())) {
+          if (modalDateError) {
+            modalDateError.textContent = "Por favor escolhe uma data futura.";
+            modalDateError.style.display = "block";
+          }
+          return;
+        }
+
+        closeModal("modal-custom-date");
+
+        document.querySelectorAll(".date-btn").forEach((b) => b.classList.remove("selected"));
+        btnCustom?.classList.add("selected");
+        const [y, m, d] = val.split("-");
+        if (labelCustom) labelCustom.innerHTML = `<strong>${d}/${m}</strong>`;
+
+        STATE.selectedDate = val;
+        loadAvailableSlots(STATE.selectedDate);
+      });
+
+      // Submit Review
+      document.getElementById("btn-submit-review")?.addEventListener("click", handleReviewSubmit);
+
+      // Segredo do Admin
+      document.getElementById("secret-admin-trigger")?.addEventListener("click", () => {
+        openModal("modal-admin-login");
+        setTimeout(() => document.getElementById("admin-pass")?.focus(), 150);
+      });
+
+      document.getElementById("btn-admin-login-submit")?.addEventListener("click", handleAdminLogin);
+      document.getElementById("admin-pass")?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") handleAdminLogin();
+      });
+    }
+
+    function openModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.style.display = "flex";
+    }
+
+    function closeModal(id) {
+      const m = document.getElementById(id);
+      if (m) m.style.display = "none";
+    }
+
+    // Carregar Radar
+    async function loadRadar() {
+      const container = document.getElementById("radar-container");
+      try {
+        const res = await fetch("/api/bairro/radar");
+        const data = await res.json();
+        const days = data.days || [];
+
+        if (!days.length) {
+          container.innerHTML = '<div style="color:var(--muted);font-size:0.75rem;grid-column:1/-1">Sem dados de radar no momento.</div>';
+          return;
+        }
+
+        container.innerHTML = days.map((d) => {
+          let badge = "";
+          if (d.closed) {
+            badge = '<span style="color:#f87171">🔴 Encerrado</span>';
+          } else if (d.hasFlash && d.freeCount > 0) {
+            badge = '<span style="color:#eab308;font-weight:800">⚡ Vaga Flash!</span>';
+          } else if (d.freeCount > 0) {
+            badge = `<span style="color:#4ade80">🟢 ${d.freeCount} Vagas</span>`;
+          } else {
+            badge = '<span style="color:#ef4444">🔴 Esgotado</span>';
+          }
+
+          return `
+            <div class="radar-day-card" data-radar-date="${d.iso}">
+              <div class="radar-day-top">
+                <span class="radar-day-label">${d.label}</span>
+                <span class="radar-day-date">${d.dateFormatted}</span>
+              </div>
+              <div class="radar-day-status">${badge}</div>
+              <div class="radar-day-hours">${d.hours}</div>
+            </div>
+          `;
+        }).join("");
+
+        container.querySelectorAll(".radar-day-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            const dateIso = card.getAttribute("data-radar-date");
+            if (!dateIso) return;
+            selectDateByIso(dateIso);
+            document.getElementById("marcar")?.scrollIntoView({ behavior: "smooth" });
+          });
+        });
+      } catch (e) {
+        container.innerHTML = '<div style="color:var(--muted);font-size:0.75rem;grid-column:1/-1">Radar temporariamente indisponível.</div>';
+      }
+    }
+
+    function selectDateByIso(iso) {
+      const btn = document.querySelector(`.date-btn[data-date="${iso}"]`);
+      if (btn) {
+        document.querySelectorAll(".date-btn").forEach((b) => b.classList.remove("selected"));
+        document.getElementById("btn-custom-date-trigger")?.classList.remove("selected");
+        btn.classList.add("selected");
+        STATE.selectedDate = iso;
+        loadAvailableSlots(iso);
+      } else {
+        const btnCustom = document.getElementById("btn-custom-date-trigger");
+        document.querySelectorAll(".date-btn").forEach((b) => b.classList.remove("selected"));
+        btnCustom?.classList.add("selected");
+        const [y, m, d] = iso.split("-");
+        if (btnCustom) btnCustom.innerHTML = `<span style="font-size:1.1rem;font-weight:800">${d}/${m}</span><span style="font-size:0.65rem">Outra</span>`;
+        STATE.selectedDate = iso;
+        loadAvailableSlots(iso);
+      }
+    }
+
+    // Carregar Marcações Salvas (Suporta múltiplas reservas no mesmo telemóvel)
+    async function loadSavedAppointments() {
+      const phone = localStorage.getItem(PHONE_KEY) || "";
+      let ids = [];
+      try {
+        ids = JSON.parse(localStorage.getItem(STORAGE_IDS_KEY) || "[]");
+      } catch (e) {}
+      const rawSingle = localStorage.getItem(STORAGE_KEY);
+      if (rawSingle) {
+        try {
+          const single = JSON.parse(rawSingle);
+          if (single?.id && !ids.includes(single.id)) ids.push(single.id);
+        } catch (e) {}
+      }
+
+      if (!phone && ids.length === 0) {
+        const banner = document.getElementById("active-banner");
+        if (banner) banner.style.display = "none";
+        return;
+      }
+
+      try {
+        const params = new URLSearchParams();
+        if (phone) params.set("phone", phone);
+        if (ids.length) params.set("ids", ids.join(","));
+
+        const res = await fetch(`/api/bairro/my-active?${params.toString()}`);
+        const data = await res.json();
+        if (data && Array.isArray(data.appointments) && data.appointments.length > 0) {
+          STATE.activeAppointments = data.appointments;
+          STATE.activeAppointment = data.appointments[0];
+          displayActiveBanners(data.appointments);
+        } else {
+          STATE.activeAppointments = [];
+          STATE.activeAppointment = null;
+          const banner = document.getElementById("active-banner");
+          if (banner) banner.style.display = "none";
+        }
+      } catch (e) {
+        console.error("Erro ao carregar marcações ativas:", e);
+      }
+    }
+
+    function displayActiveBanners(appointments) {
+      const banner = document.getElementById("active-banner");
+      const listEl = document.getElementById("active-banner-list");
+      if (!banner || !listEl) return;
+
+      if (!appointments || appointments.length === 0) {
+        banner.style.display = "none";
+        return;
+      }
+
+      listEl.innerHTML = appointments.map((appt) => {
+        const dateObj = new Date(appt.date);
+        const formattedDate = dateObj.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" });
+        const srvName = appt.service_name || appt.serviceName || "Corte de Cabelo";
+        const price = appt.service_price ? `${Number(appt.service_price).toFixed(2)}€` : "";
+        const client = appt.client_name || appt.clientName || "Cliente";
+        const phone = appt.client_phone || appt.clientPhone || "";
+        const time = `${appt.start_time || appt.startTime}h`;
+
+        return `
+          <div class="active-card-item">
+            <div>
+              <div style="font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:0.25rem">
+                ${srvName} ${price ? `<span style="color:var(--gold);font-size:0.95rem">(${price})</span>` : ""}
+              </div>
+              <div style="color:var(--muted);font-size:0.88rem;display:flex;flex-direction:column;gap:0.25rem">
+                <div>📅 <strong>${formattedDate}</strong> às <strong style="color:var(--gold);font-size:1rem">${time}</strong></div>
+                <div>👤 Em nome de: <strong>${client}</strong> ${phone ? `· 📞 <strong>${phone}</strong>` : ""}</div>
+              </div>
+            </div>
+            <div>
+              <button type="button" class="btn-danger-outline" onclick="openCancelModal('${appt.id}')">
+                <span>❌</span> Desmarcar Vaga
+              </button>
+            </div>
+          </div>
+        `;
+      }).join("");
+
+      banner.style.display = "block";
+    }
+
+    function openCancelModal(apptId) {
+      const appt = STATE.activeAppointments.find((a) => a.id === apptId) || STATE.activeAppointment;
+      if (!appt) return;
+      STATE.apptToCancel = appt;
+
+      const dateObj = new Date(appt.date);
+      const formattedDate = dateObj.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long" });
+      const client = appt.client_name || appt.clientName || "Cliente";
+      const time = `${appt.start_time || appt.startTime}h`;
+
+      const desc = document.getElementById("modal-cancel-confirm-desc");
+      if (desc) {
+        desc.innerHTML = `Tens a certeza que queres desmarcar o corte de <strong>${formattedDate} às ${time}</strong> em nome de <strong>${client}</strong>?<br><br>A vaga será libertada imediatamente para outro cliente poder marcar.`;
+      }
+      openModal("modal-cancel-confirm");
+    }
+
+    async function handleCancelActive() {
+      const appt = STATE.apptToCancel || STATE.activeAppointment;
+      if (!appt || !appt.id) return;
+      const apptId = appt.id;
+      const phone = appt.client_phone || appt.clientPhone || localStorage.getItem(PHONE_KEY) || "";
+
+      try {
+        const res = await fetch("/api/bairro/cancel", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ appointmentId: apptId, phone })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || "Não foi possível desmarcar.");
+          return;
+        }
+
+        // Remove from storage IDs
+        let ids = [];
+        try {
+          ids = JSON.parse(localStorage.getItem(STORAGE_IDS_KEY) || "[]");
+        } catch (e) {}
+        ids = ids.filter((x) => x !== apptId);
+        localStorage.setItem(STORAGE_IDS_KEY, JSON.stringify(ids));
+
+        const rawSingle = localStorage.getItem(STORAGE_KEY);
+        if (rawSingle) {
+          try {
+            const single = JSON.parse(rawSingle);
+            if (single?.id === apptId) localStorage.removeItem(STORAGE_KEY);
+          } catch (e) {}
+        }
+
+        closeModal("modal-cancel-confirm");
+        STATE.apptToCancel = null;
+        alert("✅ Marcação desmarcada com sucesso! A vaga foi libertada.");
+
+        await loadSavedAppointments();
+        loadRadar();
+        if (STATE.selectedDate) loadAvailableSlots(STATE.selectedDate);
+      } catch (err) {
+        alert("Erro de ligação.");
+      }
+    }
+
+    async function handlePhoneLookup(customPhone) {
+      const phoneInput = typeof customPhone === "string" ? customPhone : (document.getElementById("lookup-phone")?.value || "").trim();
+      const phone = (phoneInput || "").trim();
+      if (!phone || phone.replace(/\D/g, "").length < 9) {
+        alert("Por favor introduz um número de telemóvel válido (mínimo 9 dígitos).");
+        return;
+      }
+
+      try {
+        const res = await fetch(`/api/bairro/my-active?phone=${encodeURIComponent(phone)}`);
+        const data = await res.json();
+        if (data.appointments && data.appointments.length > 0) {
+          localStorage.setItem(PHONE_KEY, phone);
+          const ids = data.appointments.map((a) => a.id);
+          localStorage.setItem(STORAGE_IDS_KEY, JSON.stringify(ids));
+          STATE.activeAppointments = data.appointments;
+          STATE.activeAppointment = data.appointments[0];
+          displayActiveBanners(data.appointments);
+          closeModal("modal-lookup-phone");
+          const box = document.getElementById("lookup-box");
+          if (box) box.style.display = "none";
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          checkLoyaltyForPhone(phone);
+          alert(`✅ Encontrada(s) ${data.appointments.length} marcação(ões) ativa(s)!`);
+        } else {
+          alert("Nenhuma marcação ativa encontrada para este número.");
+        }
+      } catch (e) {
+        alert("Erro ao pesquisar.");
+      }
+    }
+
+    // Fidelização
+    function checkSavedLoyalty() {
+      const phone = localStorage.getItem(PHONE_KEY) || (STATE.activeAppointment && (STATE.activeAppointment.client_phone || STATE.activeAppointment.clientPhone));
+      if (phone) checkLoyaltyForPhone(phone);
+    }
+
+    async function checkLoyaltyForPhone(phone) {
+      try {
+        const res = await fetch(`/api/bairro/loyalty?phone=${encodeURIComponent(phone)}`);
+        const data = await res.json();
+        renderLoyaltyStamps(data.currentCycleCuts || 0, data.hasRewardReady);
+      } catch (e) {}
+    }
+
+    function renderLoyaltyStamps(cuts, hasReward) {
+      const slots = document.querySelectorAll("#loyalty-stamps-container .stamp-slot");
+      const counter = document.getElementById("loyalty-cuts-counter");
+      if (counter) counter.textContent = hasReward ? "5 de 5 (Pronto a Usar!)" : `${cuts} de 5 cortes`;
+
+      slots.forEach((slot, idx) => {
+        const slotNum = idx + 1;
+        if (hasReward || slotNum <= cuts) {
+          slot.classList.add("stamped");
+          slot.innerHTML = `<span>✂️</span>`;
+        } else {
+          slot.classList.remove("stamped");
+          slot.innerHTML = `<span>${slotNum === 5 ? "🎁 5" : slotNum}</span>`;
+        }
+      });
+    }
+
+    // Carregar Serviços
+    async function loadServices() {
+      const container = document.getElementById("services-container");
+      try {
+        const res = await fetch("/api/services");
+        const list = await res.json();
+        STATE.services = list || [];
+
+        container.innerHTML = STATE.services.map((s, idx) => `
+          <div class="service-card ${idx === 0 ? "selected" : ""}" data-id="${s.id}">
+            <div>
+              <div class="service-head">
+                <span class="service-name">${s.name}</span>
+                <span class="service-price">${Number(s.price).toFixed(2)}€</span>
+              </div>
+              <div class="service-desc">${s.description || ""}</div>
+            </div>
+            <div class="service-duration">⏱️ ~${s.duration || 45} min</div>
+          </div>
+        `).join("");
+
+        STATE.selectedServiceId = STATE.services[0].id;
+
+        container.querySelectorAll(".service-card").forEach((card) => {
+          card.addEventListener("click", () => {
+            container.querySelectorAll(".service-card").forEach((c) => c.classList.remove("selected"));
+            card.classList.add("selected");
+            STATE.selectedServiceId = card.getAttribute("data-id");
+            if (STATE.selectedDate) loadAvailableSlots(STATE.selectedDate);
+          });
+        });
+      } catch (err) {
+        container.innerHTML = '<div style="color:var(--danger)">Erro ao carregar serviços.</div>';
+      }
+    }
+
+    // Gerar Dias Iniciais
+    function generateNextDays() {
+      const container = document.getElementById("dates-container");
+      const days = [];
+      const now = new Date();
+      const weekdays = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+      const months = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
+
+      let cur = new Date(now);
+      while (days.length < 6) {
+        if (cur.getDay() !== 0) {
+          const y = cur.getFullYear();
+          const m = String(cur.getMonth() + 1).padStart(2, "0");
+          const d = String(cur.getDate()).padStart(2, "0");
+          const iso = `${y}-${m}-${d}`;
+          
+          let label = weekdays[cur.getDay()];
+          if (days.length === 0 && iso === getLocalDateStr(now)) label = "Hoje";
+          else if (days.length === 1 && iso === getLocalDateStr(new Date(now.getTime() + 86400000))) label = "Amanhã";
+
+          days.push({
+            iso,
+            weekday: label,
+            day: cur.getDate(),
+            month: months[cur.getMonth()]
+          });
+        }
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      container.innerHTML = days.map((d, idx) => `
+        <div class="date-btn ${idx === 0 ? "selected" : ""}" data-date="${d.iso}">
+          <div class="date-weekday">${d.weekday}</div>
+          <div class="date-day">${d.day}</div>
+          <div class="date-month">${d.month}</div>
+        </div>
+      `).join("");
+
+      STATE.selectedDate = days[0].iso;
+      loadAvailableSlots(STATE.selectedDate);
+
+      container.querySelectorAll(".date-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          container.querySelectorAll(".date-btn").forEach((b) => b.classList.remove("selected"));
+          document.getElementById("btn-custom-date-trigger")?.classList.remove("selected");
+          btn.classList.add("selected");
+          STATE.selectedDate = btn.getAttribute("data-date");
+          loadAvailableSlots(STATE.selectedDate);
+        });
+      });
+    }
+
+    function getLocalDateStr(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, "0");
+      const day = String(d.getDate()).padStart(2, "0");
+      return `${y}-${m}-${day}`;
+    }
+
+    // Carregar Horários Livres
+    async function loadAvailableSlots(date) {
+      const container = document.getElementById("slots-container");
+      STATE.selectedTime = null;
+      container.innerHTML = '<div style="color:var(--muted);font-size:0.85rem;padding:0.75rem 0">A verificar vagas em tempo real...</div>';
+
+      try {
+        const serviceId = STATE.selectedServiceId || (STATE.services[0] && STATE.services[0].id);
+        const res = await fetch(`/api/appointments/availability?date=${date}&serviceId=${serviceId}&bairro=true`);
+        const data = await res.json();
+
+        if (data.isNightBlocked) {
+          container.innerHTML = `<div class="slots-empty" style="color:var(--danger)">🌙 ${data.nightMessage || "Marcações encerradas durante o período noturno."}</div>`;
+          return;
+        }
+
+        const times = data.availableTimes || [];
+        if (!times.length) {
+          container.innerHTML = '<div class="slots-empty">Sem horários livres para esta data. Por favor escolhe outro dia.</div>';
+          return;
+        }
+
+        container.innerHTML = times.map((t) => `
+          <button type="button" class="slot-btn" data-time="${t}">${t}</button>
+        `).join("");
+
+        container.querySelectorAll(".slot-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            container.querySelectorAll(".slot-btn").forEach((b) => b.classList.remove("selected"));
+            btn.classList.add("selected");
+            STATE.selectedTime = btn.getAttribute("data-time");
+          });
+        });
+      } catch (err) {
+        container.innerHTML = '<div class="slots-empty" style="color:var(--danger)">Erro ao carregar horários.</div>';
+      }
+    }
+
+    // Submeter Marcação
+    async function handleBookingSubmit() {
+      const btn = document.getElementById("btn-submit-booking");
+      const name = document.getElementById("client-name")?.value.trim();
+      const phone = document.getElementById("client-phone")?.value.trim();
+      const insta = document.getElementById("client-insta")?.value.trim();
+      const notes = document.getElementById("client-notes")?.value.trim();
+
+      if (!STATE.selectedServiceId) return alert("Por favor seleciona um serviço.");
+      if (!STATE.selectedDate) return alert("Por favor seleciona um dia.");
+      if (!STATE.selectedTime) return alert("Por favor escolhe um horário livre.");
+      if (!name || name.length < 2) return alert("Por favor indica o teu nome.");
+      if (!phone || phone.replace(/\D/g, "").length < 9) return alert("Por favor indica um número de telemóvel válido.");
+
+      btn.disabled = true;
+      btn.innerHTML = 'A confirmar vaga... ⏳';
+
+      try {
+        const payload = {
+          serviceId: STATE.selectedServiceId,
+          date: STATE.selectedDate,
+          startTime: STATE.selectedTime,
+          clientName: name,
+          clientPhone: phone,
+          clientInstagram: insta || null,
+          notes: notes || null
+        };
+
+        const res = await fetch("/api/bairro/book", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          alert(data.error || "Não foi possível efetuar a marcação.");
+          btn.disabled = false;
+          btn.innerHTML = '<span>CONFIRMAR CORTE</span> ✂️';
+          return;
+        }
+
+        if (data.appointment) {
+          let ids = [];
+          try {
+            ids = JSON.parse(localStorage.getItem(STORAGE_IDS_KEY) || "[]");
+          } catch (e) {}
+          if (!ids.includes(data.appointment.id)) ids.push(data.appointment.id);
+          localStorage.setItem(STORAGE_IDS_KEY, JSON.stringify(ids));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(data.appointment));
+          localStorage.setItem(PHONE_KEY, phone);
+          await loadSavedAppointments();
+          checkLoyaltyForPhone(phone);
+        }
+
+        const srv = STATE.services.find((s) => s.id === STATE.selectedServiceId);
+        const srvName = srv ? srv.name : "Corte";
+        document.getElementById("modal-success-desc").innerHTML = `
+          <strong>${srvName}</strong> marcado com sucesso!<br>
+          📅 <strong>${new Date(STATE.selectedDate).toLocaleDateString("pt-PT")}</strong> às <strong>${STATE.selectedTime}h</strong>.<br>
+          Nome: <strong>${name}</strong><br><br>
+          📍 Centro comercial São Julião, Setúbal.<br>
+          Contamos contigo!
+        `;
+
+        openModal("modal-success");
+
+        // Limpar campos de cliente para evitar confusão em marcações posteriores no mesmo telemóvel
+        const nameInput = document.getElementById("client-name");
+        if (nameInput) nameInput.value = "";
+        const notesInput = document.getElementById("client-notes");
+        if (notesInput) notesInput.value = "";
+
+        STATE.selectedTime = null;
+        loadAvailableSlots(STATE.selectedDate);
+        loadRadar();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+
+      } catch (err) {
+        alert("Erro de ligação. Tenta novamente.");
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<span>CONFIRMAR CORTE</span> ✂️';
+      }
+    }
+
+    // Produtos
+    async function loadProducts() {
+      const container = document.getElementById("products-container");
+      try {
+        const res = await fetch("/api/products");
+        const list = await res.json();
+        if (!list || !list.length) return;
+
+        container.innerHTML = list.slice(0, 4).map((p) => `
+          <div class="product-card">
+            <img src="${p.imageUrl}" alt="${p.name}" class="product-img" onerror="this.src='/img/logo.png'">
+            <div class="product-name">${p.name}</div>
+            <div style="font-size:0.75rem;color:var(--muted)">${p.category || "Barbearia"}</div>
+            <div class="product-price">${Number(p.price).toFixed(2)}€</div>
+          </div>
+        `).join("");
+      } catch (e) {}
+    }
+
+    // Avaliações
+    async function loadReviews() {
+      const container = document.getElementById("reviews-container");
+      try {
+        const res = await fetch("/api/bairro/reviews");
+        const list = await res.json();
+        if (!list || !list.length) return;
+
+        container.innerHTML = list.map((r) => `
+          <div class="review-card">
+            <div class="review-author">
+              <span>${r.name}</span>
+              <span class="review-stars">${"★".repeat(r.rating || 5)}</span>
+            </div>
+            <div class="review-comment">"${r.comment}"</div>
+          </div>
+        `).join("");
+      } catch (e) {}
+    }
+
+    function openReviewModal() {
+      const savedPhone = localStorage.getItem(PHONE_KEY) || (STATE.activeAppointment && (STATE.activeAppointment.client_phone || STATE.activeAppointment.clientPhone));
+      const savedName = STATE.activeAppointment && (STATE.activeAppointment.client_name || STATE.activeAppointment.clientName);
+      
+      const phoneInput = document.getElementById("review-phone");
+      const nameInput = document.getElementById("review-name");
+      if (phoneInput && savedPhone && !phoneInput.value) phoneInput.value = savedPhone;
+      if (nameInput && savedName && !nameInput.value) nameInput.value = savedName;
+
+      openModal("modal-review");
+    }
+
+    async function handleReviewSubmit() {
+      const name = document.getElementById("review-name")?.value.trim();
+      const phone = document.getElementById("review-phone")?.value.trim();
+      const rating = document.getElementById("review-rating")?.value;
+      const comment = document.getElementById("review-comment")?.value.trim();
+      const btn = document.getElementById("btn-submit-review");
+
+      if (!name || name.length < 2) return alert("Por favor indica o teu nome.");
+      if (!phone || phone.replace(/\D/g, "").length < 9) return alert("Por favor indica o teu número de telemóvel para verificar o teu corte.");
+      if (!comment || comment.length < 4) return alert("Por favor escreve um comentário breve sobre o corte.");
+
+      if (btn) {
+        btn.disabled = true;
+        btn.textContent = "A validar marcação... ⏳";
+      }
+
+      try {
+        const res = await fetch("/api/bairro/reviews", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, phone, rating, comment })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          if (btn) { btn.disabled = false; btn.textContent = "Enviar Avaliação ⭐"; }
+          return alert(data.error || "Erro ao registar avaliação.");
+        }
+
+        alert("⭐ Obrigado pela tua avaliação!");
+        closeModal("modal-review");
+        loadReviews();
+      } catch (e) {
+        alert("Erro ao enviar avaliação.");
+      } finally {
+        if (btn) { btn.disabled = false; btn.textContent = "Enviar Avaliação ⭐"; }
+      }
+    }
+
+    // Assistente Virtual AI (Diogo Viegas AI)
+    let assistantOpen = false;
+    let assistantLoading = false;
+    let assistantMessages = [
+      {
+        role: "assistant",
+        text: "Olá! Sou o assistente oficial da Viegas Barber 💈\nComo te posso ajudar hoje? Clica numa sugestão abaixo ou faz a tua pergunta:",
+      },
+    ];
+    const quickSuggestions = ["✂️ Preçário", "🕒 Horários", "📍 Localização", "📅 Como marcar?", "💈 O Diogo"];
+
+    function escapeHtml(str) {
+      if (!str) return "";
+      return String(str).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function formatChatMessage(text) {
+      if (!text) return "";
+      let html = escapeHtml(text);
+      html = html.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+      html = html.replace(/^[•\-]\s+(.+)$/gm, '<div class="chat-bullet-item"><span class="chat-bullet-dot"></span><span class="chat-bullet-text">$1</span></div>');
+      html = html.replace(/&quot;MARCAR AGORA&quot;|MARCAR AGORA/gi, '<div class="chat-cta-wrap"><a href="#marcar" class="chat-cta-link" onclick="assistantOpen=false;renderAssistant();">✂️ MARCAR AGORA →</a></div>');
+      html = html.replace(/\n{2,}/g, '<div class="chat-para-break"></div>');
+      html = html.replace(/\n/g, "<br>");
+      return html;
+    }
+
+    function renderAssistant() {
+      const host = document.getElementById("assistant");
+      const backdrop = document.getElementById("assistant-backdrop");
+      if (!host || !backdrop) return;
+
+      host.classList.toggle("open", assistantOpen);
+      backdrop.classList.toggle("active", assistantOpen);
+
+      if (assistantOpen && window.innerWidth <= 640) {
+        document.body.style.overflow = "hidden";
+      } else {
+        document.body.style.overflow = "";
+      }
+
+      if (!assistantOpen) {
+        host.innerHTML = `
+          <button class="assistant-btn" id="open-assistant-btn" title="Falar com o assistente do Viegas">
+            <span class="assistant-pulse"></span>
+            <span>💬 Diogo AI</span>
+          </button>`;
+        host.querySelector("#open-assistant-btn")?.addEventListener("click", () => {
+          assistantOpen = true;
+          renderAssistant();
+        });
+        return;
+      }
+
+      host.innerHTML = `
+        <div class="chat">
+          <div class="chat-mobile-handle"></div>
+          <div class="chat-head">
+            <div style="display:flex;align-items:center;gap:.6rem">
+              <span style="font-size:1.15rem">💈</span>
+              <div>
+                <div style="font-size:.9rem;font-weight:800;line-height:1.2">Viegas Barber AI</div>
+                <div class="chat-head-status"><span class="assistant-pulse" style="width:.4rem;height:.4rem"></span> Online • Resposta imediata</div>
+              </div>
+            </div>
+            <button class="chat-close-btn" id="close-chat" title="Fechar assistente" aria-label="Fechar">✕</button>
+          </div>
+          <div class="chat-body" id="chat-scroll">
+            ${assistantMessages.map((m) => `
+              <div class="bubble ${m.role}">
+                ${m.role === "assistant" ? formatChatMessage(m.text) : escapeHtml(m.text)}
+              </div>`).join("")}
+            ${assistantLoading ? `
+              <div class="bubble assistant" style="display:inline-flex;align-items:center;gap:.5rem;font-style:italic;color:var(--muted)">
+                <span class="assistant-pulse" style="width:.45rem;height:.45rem"></span> A escrever resposta...
+              </div>` : ""}
+          </div>
+          <div class="chat-suggestions-bar">
+            ${quickSuggestions.map((s) => `<button type="button" class="chat-suggestion-chip" data-chip="${s}">${s}</button>`).join("")}
+          </div>
+          <form class="chat-form" id="chat-form">
+            <input name="q" placeholder="Escreve uma pergunta..." autocomplete="off" ${assistantLoading ? "disabled" : ""}>
+            <button type="submit" ${assistantLoading ? "disabled" : ""}>Enviar</button>
+          </form>
+        </div>`;
+
+      const scrollEl = host.querySelector("#chat-scroll");
+      if (scrollEl) {
+        requestAnimationFrame(() => {
+          scrollEl.scrollTop = scrollEl.scrollHeight;
+        });
+      }
+
+      host.querySelector("#close-chat")?.addEventListener("click", () => {
+        assistantOpen = false;
+        renderAssistant();
+      });
+
+      host.querySelectorAll("[data-chip]").forEach((b) => {
+        b.addEventListener("click", () => {
+          sendUserAssistantMessage(b.dataset.chip);
+        });
+      });
+
+      const form = host.querySelector("#chat-form");
+      form?.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = form.querySelector("input");
+        const text = input?.value.trim();
+        if (!text || assistantLoading) return;
+        input.value = "";
+        sendUserAssistantMessage(text);
+      });
+    }
+
+    async function sendUserAssistantMessage(text) {
+      assistantMessages.push({ role: "user", text });
+      assistantLoading = true;
+      renderAssistant();
+
+      try {
+        const res = await fetch("/api/assistant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: text })
+        });
+        const data = await res.json();
+        assistantMessages.push({ role: "assistant", text: data.reply || "Desculpa, não consegui obter resposta no momento." });
+      } catch (err) {
+        assistantMessages.push({ role: "assistant", text: "Erro ao contactar o servidor. Tenta novamente." });
+      } finally {
+        assistantLoading = false;
+        renderAssistant();
+      }
+    }
+
+    function mountAssistant() {
+      const backdrop = document.getElementById("assistant-backdrop");
+      if (backdrop) {
+        backdrop.addEventListener("click", () => {
+          assistantOpen = false;
+          renderAssistant();
+        });
+      }
+      renderAssistant();
+    }
+
+    // Login Admin
+    async function handleAdminLogin() {
+      const email = document.getElementById("admin-user")?.value.trim();
+      const password = document.getElementById("admin-pass")?.value.trim();
+      const errBox = document.getElementById("admin-error");
+      const btn = document.getElementById("btn-admin-login-submit");
+
+      if (!email || !password) {
+        errBox.textContent = "Introduz o utilizador e a palavra-passe.";
+        errBox.style.display = "block";
+        return;
+      }
+
+      errBox.style.display = "none";
+      btn.disabled = true;
+      btn.textContent = "A entrar...";
+
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (!res.ok) {
+          errBox.textContent = data.error || "Palavra-passe incorreta.";
+          errBox.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Entrar na Dashboard ⚙️";
+          return;
+        }
+
+        window.location.href = "/dashboard";
+      } catch (err) {
+        errBox.textContent = "Erro de ligação ao servidor.";
+        errBox.style.display = "block";
+        btn.disabled = false;
+        btn.textContent = "Entrar na Dashboard ⚙️";
+      }
+    }
+  </script>
 </body>
 </html>
-
