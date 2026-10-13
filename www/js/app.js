@@ -1908,6 +1908,44 @@ const VB = (() => {
             </div>
           </div>
 
+          <div class="agenda-quick-actions" style="display:flex;gap:.6rem;margin-bottom:1.2rem;flex-wrap:wrap">
+            <button type="button" class="btn brand-button" id="btn-quick-add" style="flex:1;min-width:140px;padding:.55rem .8rem;font-size:.82rem">➕ Marcar Cliente Manual</button>
+            <button type="button" class="btn btn-ghost" id="btn-quick-block" style="flex:1;min-width:140px;padding:.55rem .8rem;font-size:.82rem;border:1px solid rgba(239,68,68,0.4);color:#ef4444">⛔ Bloquear Horário</button>
+          </div>
+
+          <div id="quick-add-panel" style="display:none;background:var(--card-bg, #12141c);border:1px solid rgba(212,175,55,0.3);border-radius:12px;padding:1rem;margin-bottom:1.2rem">
+            <h4 style="margin:0 0 .8rem;color:var(--accent);font-size:.95rem">✂️ Adicionar Marcação Manual (${date.split("-").reverse().join("/")})</h4>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:.6rem;margin-bottom:.8rem">
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Nome do Cliente *</label><input type="text" id="qa-name" placeholder="Ex: João Silva" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Telemóvel</label><input type="tel" id="qa-phone" placeholder="Ex: 912345678" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Hora de Início *</label><input type="time" id="qa-time" value="14:00" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Serviço</label>
+                <select id="qa-service" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff">
+                  <option value="srv-corte-12">Corte (12€)</option>
+                  <option value="srv-corte-sobrancelha-14">Corte + Sobrancelha (14€)</option>
+                  <option value="srv-corte-barba-17">Corte + Barba (17€)</option>
+                  <option value="srv-pack-completo-18">Pack Completo (18€)</option>
+                </select>
+              </div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end">
+              <button type="button" class="btn btn-ghost" id="qa-cancel" style="padding:.4rem .8rem;font-size:.8rem">Cancelar</button>
+              <button type="button" class="btn brand-button" id="qa-save" style="padding:.4rem 1rem;font-size:.8rem">Guardar Marcação</button>
+            </div>
+          </div>
+
+          <div id="quick-block-panel" style="display:none;background:var(--card-bg, #12141c);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:1rem;margin-bottom:1.2rem">
+            <h4 style="margin:0 0 .8rem;color:#ef4444;font-size:.95rem">⛔ Bloquear Horário (${date.split("-").reverse().join("/")})</h4>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Hora Início *</label><input type="time" id="qb-start" value="14:00" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Hora Fim *</label><input type="time" id="qb-end" value="15:00" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
+            </div>
+            <div style="display:flex;gap:.5rem;justify-content:flex-end">
+              <button type="button" class="btn btn-ghost" id="qb-cancel" style="padding:.4rem .8rem;font-size:.8rem">Cancelar</button>
+              <button type="button" class="btn" id="qb-save" style="background:#ef4444;color:#fff;border:none;border-radius:6px;padding:.4rem 1rem;font-size:.8rem">Bloquear Horário</button>
+            </div>
+          </div>
+
           ${rows.length === 0 ? `
             <div class="agenda-empty-state">
               <span class="agenda-empty-icon">✂️</span>
@@ -2185,6 +2223,91 @@ const VB = (() => {
       window.__dashPopstateBound = true;
       window.addEventListener("popstate", () => {
         if (document.body.dataset.page === "dashboard") pageDashboard();
+      });
+    }
+
+    // Ações Rápidas da Agenda: Marcar Manual & Bloquear
+    const btnQuickAdd = document.getElementById("btn-quick-add");
+    const btnQuickBlock = document.getElementById("btn-quick-block");
+    const pnlQuickAdd = document.getElementById("quick-add-panel");
+    const pnlQuickBlock = document.getElementById("quick-block-panel");
+
+    if (btnQuickAdd && pnlQuickAdd) {
+      btnQuickAdd.onclick = () => {
+        const isHidden = pnlQuickAdd.style.display === "none";
+        pnlQuickAdd.style.display = isHidden ? "block" : "none";
+        if (pnlQuickBlock) pnlQuickBlock.style.display = "none";
+      };
+      document.getElementById("qa-cancel")?.addEventListener("click", () => {
+        pnlQuickAdd.style.display = "none";
+      });
+      document.getElementById("qa-save")?.addEventListener("click", async () => {
+        const name = document.getElementById("qa-name")?.value?.trim();
+        const phone = document.getElementById("qa-phone")?.value?.trim();
+        const time = document.getElementById("qa-time")?.value;
+        const serviceId = document.getElementById("qa-service")?.value;
+        const urlDate = new URLSearchParams(location.search).get("date");
+        const apptDate = (tab === "hoje" && !urlDate) ? todayIso : (urlDate || todayIso);
+
+        if (!name || !time) {
+          alert("Por favor indica o nome do cliente e o horário.");
+          return;
+        }
+
+        try {
+          await api("/api/admin/appointments", {
+            method: "POST",
+            body: {
+              clientName: name,
+              clientPhone: phone,
+              serviceId,
+              date: apptDate,
+              startTime: time,
+            },
+          });
+          alert("Corte agendado com sucesso!");
+          pageDashboard();
+        } catch (err) {
+          alert("Erro ao marcar corte: " + (err.message || "Tenta novamente"));
+        }
+      });
+    }
+
+    if (btnQuickBlock && pnlQuickBlock) {
+      btnQuickBlock.onclick = () => {
+        const isHidden = pnlQuickBlock.style.display === "none";
+        pnlQuickBlock.style.display = isHidden ? "block" : "none";
+        if (pnlQuickAdd) pnlQuickAdd.style.display = "none";
+      };
+      document.getElementById("qb-cancel")?.addEventListener("click", () => {
+        pnlQuickBlock.style.display = "none";
+      });
+      document.getElementById("qb-save")?.addEventListener("click", async () => {
+        const startTime = document.getElementById("qb-start")?.value;
+        const endTime = document.getElementById("qb-end")?.value;
+        const urlDate = new URLSearchParams(location.search).get("date");
+        const blockDate = (tab === "hoje" && !urlDate) ? todayIso : (urlDate || todayIso);
+
+        if (!startTime || !endTime) {
+          alert("Indica a hora de início e hora de fim.");
+          return;
+        }
+
+        try {
+          await api("/api/admin/blocked-times", {
+            method: "POST",
+            body: {
+              date: blockDate,
+              startTime,
+              endTime,
+              reason: "Bloqueio Manual",
+            },
+          });
+          alert(`Horário ${startTime} às ${endTime} bloqueado no site com sucesso!`);
+          pageDashboard();
+        } catch (err) {
+          alert("Erro ao bloquear horário: " + (err.message || "Tenta novamente"));
+        }
       });
     }
 

@@ -1398,6 +1398,71 @@ app.patch("/api/admin/appointments/:id", requireStaff, async (req, res) => {
   res.json({ ok: true });
 });
 
+app.post("/api/admin/appointments", requireStaff, async (req, res) => {
+  try {
+    const { clientName, clientPhone, serviceId, date, startTime, notes } = req.body || {};
+    if (!clientName || !date || !startTime) {
+      return res.status(400).json({ error: "Nome, data e hora são obrigatórios." });
+    }
+
+    const service = await db.services().findOne({ id: serviceId || "srv-corte-12" });
+    const sId = service?.id || "srv-corte-12";
+    const startMins = timeToMinutes(startTime);
+    const endMins = startMins + 50;
+    const endTime = minutesToTime(endMins);
+
+    let user = null;
+    if (clientPhone) {
+      user = await db.users().findOne({ phone: clientPhone });
+    }
+    if (!user) {
+      const cleanPhone = (clientPhone || "").replace(/\D/g, "");
+      const guestEmail = cleanPhone ? `manual_${cleanPhone}@viegasbarber.pt` : `manual_${id().slice(0, 8)}@viegasbarber.pt`;
+      user = {
+        id: id(),
+        name: clientName.trim(),
+        phone: clientPhone || null,
+        email: guestEmail,
+        role: "CLIENT",
+        created_at: new Date().toISOString(),
+      };
+      await db.users().insertOne(user);
+    }
+
+    const newAppt = {
+      id: id(),
+      user_id: user.id,
+      client_name: clientName.trim(),
+      client_phone: clientPhone || null,
+      service_id: sId,
+      date,
+      start_time: startTime,
+      end_time: endTime,
+      status: "SCHEDULED",
+      notes: notes || null,
+      created_via: "ADMIN_MANUAL",
+      loyalty_awarded: false,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    await db.appointments().insertOne(newAppt);
+    res.json({ ok: true, appointment: newAppt });
+  } catch (error) {
+    console.error("Erro ao criar marcação manual:", error);
+    res.status(500).json({ error: "Erro ao criar marcação manual." });
+  }
+});
+
+app.delete("/api/admin/blocked-times/:id", requireStaff, async (req, res) => {
+  try {
+    await db.blocked_times().deleteOne({ id: req.params.id });
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao remover bloqueio." });
+  }
+});
+
 app.get("/api/admin/clients", requireStaff, async (_req, res) => {
   const users = await db.users().find({ role: "CLIENT" }).sort({ created_at: -1 }).toArray();
   const result = [];
