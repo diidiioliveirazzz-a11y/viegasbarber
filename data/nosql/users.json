@@ -38,20 +38,18 @@
     "email": "scscs@instagram.user",
     "password": "$2b$12$YQL5RPmSU.rCpZKW6m9uf.6sfyJZc1QCj0xQkwSP8iHsG.izc1PSO",
     "role": "CLIENT",
-    "has_subscription": false,
-    "created_at": "2026-10-09T16:22:48.462Z",
-    "updated_at": "2026-10-09T16:22:48.464Z"
+    "created_at": "2026-10-09T22:36:20.158Z",
+    "updated_at": "2026-10-09T22:36:20.158Z"
   },
   {
     "_id": "73827997-ccc2-4d22-b6dc-22b1e8ca0f2e",
     "id": "73827997-ccc2-4d22-b6dc-22b1e8ca0f2e",
     "name": "dhdhfh",
     "email": "dhdhdbd@instagram.user",
-    "password": "$2b$12$AfhDvJyuunEnYPAivuwz2e8Cx0d.TbZnJYvN4dfXvHr9U0W5rtGKO",
+    "password": "$2b$12$R.32367n5/1k62ZqX5s8.evB76P3E467gR1m5s0YqjK3P9Q3Lg2kC",
     "role": "CLIENT",
-    "has_subscription": false,
-    "created_at": "2026-10-09T22:37:59.883Z",
-    "updated_at": "2026-10-09T22:37:59.883Z"
+    "created_at": "2026-10-09T22:38:23.978Z",
+    "updated_at": "2026-10-09T22:38:23.978Z"
   },
   {
     "_id": "aaa583be-953a-4c87-83fe-84e061776641",
@@ -94,5 +92,27 @@
     "role": "CLIENT",
     "created_at": "2026-10-12T19:59:41.845Z",
     "updated_at": "2026-10-12T19:59:41.845Z"
+  },
+  {
+    "_id": "901f1004-0602-4399-ad6d-40bb675c1437",
+    "id": "901f1004-0602-4399-ad6d-40bb675c1437",
+    "name": "Joabe",
+    "phone": "+351939504261",
+    "instagram": null,
+    "email": "bairro_351939504261@bairro.viegasbarber.pt",
+    "role": "CLIENT",
+    "created_at": "2026-10-13T11:08:26.900Z",
+    "updated_at": "2026-10-13T11:08:26.900Z"
+  },
+  {
+    "_id": "93bc47a6-02a0-45dc-8043-b36523ccdbee",
+    "id": "93bc47a6-02a0-45dc-8043-b36523ccdbee",
+    "name": "Serrado",
+    "phone": "964250761",
+    "instagram": null,
+    "email": "bairro_964250761@bairro.viegasbarber.pt",
+    "role": "CLIENT",
+    "created_at": "2026-10-13T11:04:46.942Z",
+    "updated_at": "2026-10-13T11:04:46.942Z"
   }
 ]
