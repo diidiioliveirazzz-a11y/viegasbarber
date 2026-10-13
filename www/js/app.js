@@ -1862,11 +1862,15 @@ const VB = (() => {
       const rows = data.appointments || (Array.isArray(data) ? data : []);
 
       // Calculate Day Statistics
-      const scheduledCount = rows.filter((a) => a.status === "SCHEDULED").length;
-      const completedCount = rows.filter((a) => a.status === "COMPLETED").length;
-      const totalEstimated = rows
-        .filter((a) => a.status !== "CANCELLED")
-        .reduce((sum, a) => sum + (Number(a.price) || 12), 0);
+      const scheduledList = rows.filter((a) => a.status === "SCHEDULED");
+      const completedList = rows.filter((a) => a.status === "COMPLETED");
+      const scheduledCount = scheduledList.length;
+      const completedCount = completedList.length;
+
+      // Dinheiro feito = APENAS cortes concluídos
+      const totalCompletedEarned = completedList.reduce((sum, a) => sum + (Number(a.price) || 0), 0);
+      // Dinheiro previsto = cortes concluídos + cortes agendados pendentes
+      const totalProjected = [...completedList, ...scheduledList].reduce((sum, a) => sum + (Number(a.price) || 0), 0);
 
       // Safe Prev/Next calculations
       const prevStr = shiftDateStr(date, -1);
@@ -1895,16 +1899,20 @@ const VB = (() => {
 
           <div class="agenda-stats-bar">
             <div class="agenda-stat-card">
-              <span class="agenda-stat-label">Total Agendados</span>
+              <span class="agenda-stat-label">Agendados</span>
               <span class="agenda-stat-value" style="color:var(--accent)">${scheduledCount}</span>
             </div>
             <div class="agenda-stat-card">
-              <span class="agenda-stat-label">Cortes Concluídos</span>
+              <span class="agenda-stat-label">Concluídos</span>
               <span class="agenda-stat-value" style="color:#22c55e">${completedCount}</span>
             </div>
             <div class="agenda-stat-card">
-              <span class="agenda-stat-label">Total do Dia (~€)</span>
-              <span class="agenda-stat-value">${totalEstimated.toFixed(2)}€</span>
+              <span class="agenda-stat-label">Total Ganho (Feito)</span>
+              <span class="agenda-stat-value" style="color:#22c55e">${totalCompletedEarned.toFixed(2)}€</span>
+            </div>
+            <div class="agenda-stat-card">
+              <span class="agenda-stat-label">Total Previsto</span>
+              <span class="agenda-stat-value" style="color:var(--muted)">${totalProjected.toFixed(2)}€</span>
             </div>
           </div>
 
@@ -1976,7 +1984,7 @@ const VB = (() => {
                       </div>
 
                       <div class="agenda-service-info">
-                        <span class="agenda-service-tag">✂️ ${escapeHtml(a.service_name || "Corte")}</span>
+                        <span class="agenda-service-tag">✂️ ${escapeHtml(a.service_name || "Corte")}${a.price ? ` · <span style="color:var(--accent);font-weight:900">${Number(a.price).toFixed(2)}€</span>` : ""}</span>
                         ${a.is_silent ? `<span class="agenda-pref-pill">🤫 Silencioso</span>` : ""}
                         ${a.music_request ? `<span class="agenda-pref-pill">🎵 ${escapeHtml(a.music_request)}</span>` : ""}
                       </div>
