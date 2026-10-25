@@ -271,6 +271,7 @@ async function getActiveBarbers() {
     role: u.role,
     phone: u.phone || "",
     username: u.username || (u.role === "ADMIN" ? "admin" : "sandro"),
+    instagram: u.instagram || (u.id === SANDRO_BARBER_ID ? "sandro_miguel22_" : (u.role === "ADMIN" ? "v_barber8" : "")),
   }));
 }
 
@@ -451,16 +452,25 @@ app.post("/api/auth/login", async (req, res) => {
     const password = String(req.body.password || "");
     if (!identifier || !password) return res.status(400).json({ error: "Utilizador ou palavra-passe incorretos." });
 
+    const cleanHandle = identifier.replace(/^@/, "").toLowerCase().trim();
     let user;
     if (identifier === "admin") {
       user = await db.users().findOne({ $or: [{ role: "ADMIN" }, { username: "admin" }] });
-    } else if (identifier === "sandro") {
-      user = await db.users().findOne({ $or: [{ username: "sandro" }, { email: "sandro@viegasbarber.pt" }, { id: SANDRO_BARBER_ID }] });
+    } else if (cleanHandle === "sandro" || cleanHandle === "sandro_miguel22_") {
+      user = await db.users().findOne({
+        $or: [
+          { username: "sandro" },
+          { email: "sandro@viegasbarber.pt" },
+          { id: SANDRO_BARBER_ID },
+          { instagram: "sandro_miguel22_" },
+        ],
+      });
     } else {
       user = await db.users().findOne({
         $or: [
           { email: identifier },
           { username: identifier },
+          { instagram: cleanHandle },
           { phone: identifier },
         ],
       });
