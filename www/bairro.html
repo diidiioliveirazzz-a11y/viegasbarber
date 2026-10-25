@@ -531,6 +531,89 @@
       color: var(--muted);
     }
 
+    /* Radar Barber Filter */
+    .radar-barber-filter {
+      display: flex;
+      gap: 0.4rem;
+      margin: 0.6rem 0 0.8rem;
+      overflow-x: auto;
+      padding-bottom: 2px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .radar-filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      color: var(--muted);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.35rem 0.8rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+    .radar-filter-btn:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #fff;
+    }
+    .radar-filter-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #000;
+      font-weight: 700;
+    }
+
+    /* Barbers Grid (Passo 2) */
+    .barbers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.65rem;
+      margin-bottom: 1.75rem;
+    }
+    .barber-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1.5px solid var(--card-border);
+      border-radius: 0.85rem;
+      padding: 0.8rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .barber-card:hover {
+      border-color: rgba(212, 175, 55, 0.5);
+      transform: translateY(-2px);
+    }
+    .barber-card.selected {
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.08);
+      box-shadow: 0 0 12px rgba(212, 175, 55, 0.2);
+    }
+    .barber-icon {
+      font-size: 1.35rem;
+      flex-shrink: 0;
+    }
+    .barber-info {
+      display: flex;
+      flex-direction: column;
+      text-align: left;
+    }
+    .barber-name {
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: #fff;
+    }
+    .barber-desc {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 1px;
+    }
+
     /* Booking Card */
     .booking-card {
       background: var(--card-bg);
@@ -1635,6 +1718,12 @@
         </div>
         <span class="radar-badge-live">AO VIVO</span>
       </div>
+      <!-- Filtro de Barbeiro no Radar -->
+      <div class="radar-barber-filter">
+        <button type="button" class="radar-filter-btn active" data-radar-barber="any">👥 Geral</button>
+        <button type="button" class="radar-filter-btn" data-radar-barber="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9">💈 Diogo Viegas</button>
+        <button type="button" class="radar-filter-btn" data-radar-barber="barber-sandro-miguel">💈 Sandro Miguel</button>
+      </div>
       <div class="radar-grid" id="radar-container">
         <div style="color:var(--muted);font-size:0.75rem;grid-column:1/-1">A carregar radar de vagas...</div>
       </div>
@@ -1652,9 +1741,38 @@
         <div style="color:var(--muted);font-size:0.85rem">A carregar serviços...</div>
       </div>
 
-      <!-- Passo 2: Data e Horário Livre -->
+      <!-- Passo 2: Escolhe o Barbeiro -->
       <div class="step-title">
         <span class="step-num">2</span>
+        <span>Escolhe o Barbeiro</span>
+      </div>
+      <div class="barbers-grid" id="barbers-container">
+        <div class="barber-card selected" data-barber-id="any">
+          <div class="barber-icon">⚡</div>
+          <div class="barber-info">
+            <span class="barber-name">Sem Preferência</span>
+            <span class="barber-desc">Primeiro disponível</span>
+          </div>
+        </div>
+        <div class="barber-card" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9">
+          <div class="barber-icon">💈</div>
+          <div class="barber-info">
+            <span class="barber-name">Diogo Viegas</span>
+            <span class="barber-desc">Fundador</span>
+          </div>
+        </div>
+        <div class="barber-card" data-barber-id="barber-sandro-miguel">
+          <div class="barber-icon">💈</div>
+          <div class="barber-info">
+            <span class="barber-name">Sandro Miguel</span>
+            <span class="barber-desc">Barbeiro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Passo 3: Data e Horário Livre -->
+      <div class="step-title">
+        <span class="step-num">3</span>
         <span>Escolhe o Dia & Horário Livre</span>
       </div>
       
@@ -1674,9 +1792,9 @@
         </div>
       </div>
 
-      <!-- Passo 3: Dados -->
+      <!-- Passo 4: Dados -->
       <div class="step-title">
-        <span class="step-num">3</span>
+        <span class="step-num">4</span>
         <span>Os Teus Dados</span>
       </div>
 
@@ -1955,7 +2073,7 @@
       </div>
       <div class="form-group">
         <label for="admin-user">Utilizador</label>
-        <input type="text" id="admin-user" class="form-input" value="admin" autocomplete="username">
+        <input type="text" id="admin-user" class="form-input" placeholder="admin ou sandro" autocomplete="username">
       </div>
       <div class="form-group">
         <label for="admin-pass">Palavra-passe</label>
@@ -1973,6 +2091,7 @@
     const STATE = {
       services: [],
       selectedServiceId: null,
+      selectedBarberId: "any",
       selectedDate: null,
       selectedTime: null,
       activeAppointments: [],
@@ -2118,6 +2237,24 @@
         loadAvailableSlots(STATE.selectedDate);
       });
 
+      // Filtros de Barbeiro no Radar
+      document.querySelectorAll(".radar-filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".radar-filter-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          const bId = btn.getAttribute("data-radar-barber") || "any";
+          loadRadar(bId);
+        });
+      });
+
+      // Seleção de Barbeiro nas Marcações
+      document.querySelectorAll(".barber-card").forEach((card) => {
+        card.addEventListener("click", () => {
+          const bId = card.getAttribute("data-barber-id") || "any";
+          selectBarber(bId);
+        });
+      });
+
       // Submit Review
       document.getElementById("btn-submit-review")?.addEventListener("click", handleReviewSubmit);
 
@@ -2143,11 +2280,14 @@
       if (m) m.style.display = "none";
     }
 
+    let currentRadarBarber = "any";
+
     // Carregar Radar
-    async function loadRadar() {
+    async function loadRadar(barberId) {
+      if (barberId !== undefined) currentRadarBarber = barberId;
       const container = document.getElementById("radar-container");
       try {
-        const res = await fetch("/api/bairro/radar");
+        const res = await fetch(`/api/bairro/radar?barberId=${currentRadarBarber}`);
         const data = await res.json();
         const days = data.days || [];
 
@@ -2185,11 +2325,28 @@
             const dateIso = card.getAttribute("data-radar-date");
             if (!dateIso) return;
             selectDateByIso(dateIso);
+            if (currentRadarBarber && currentRadarBarber !== "any") {
+              selectBarber(currentRadarBarber);
+            }
             document.getElementById("marcar")?.scrollIntoView({ behavior: "smooth" });
           });
         });
       } catch (e) {
         container.innerHTML = '<div style="color:var(--muted);font-size:0.75rem;grid-column:1/-1">Radar temporariamente indisponível.</div>';
+      }
+    }
+
+    function selectBarber(barberId) {
+      STATE.selectedBarberId = barberId;
+      document.querySelectorAll(".barber-card").forEach((c) => {
+        if (c.getAttribute("data-barber-id") === barberId) {
+          c.classList.add("selected");
+        } else {
+          c.classList.remove("selected");
+        }
+      });
+      if (STATE.selectedDate) {
+        loadAvailableSlots(STATE.selectedDate);
       }
     }
 
@@ -2282,7 +2439,7 @@
               </div>
               <div style="color:var(--muted);font-size:0.88rem;display:flex;flex-direction:column;gap:0.25rem">
                 <div>📅 <strong>${formattedDate}</strong> às <strong style="color:var(--gold);font-size:1rem">${time}</strong></div>
-                <div>👤 Em nome de: <strong>${client}</strong> ${phone ? `· 📞 <strong>${phone}</strong>` : ""}</div>
+                <div>👤 Em nome de: <strong>${client}</strong> ${phone ? `· 📞 <strong>${phone}</strong>` : ""} · 💈 Barbeiro: <strong style="color:var(--gold)">${appt.barber_name || appt.barberName || "Diogo Viegas"}</strong></div>
               </div>
             </div>
             <div>
@@ -2527,7 +2684,8 @@
 
       try {
         const serviceId = STATE.selectedServiceId || (STATE.services[0] && STATE.services[0].id);
-        const res = await fetch(`/api/appointments/availability?date=${date}&serviceId=${serviceId}&bairro=true`);
+        const barberParam = STATE.selectedBarberId ? `&barberId=${encodeURIComponent(STATE.selectedBarberId)}` : "";
+        const res = await fetch(`/api/appointments/availability?date=${date}&serviceId=${serviceId}&bairro=true${barberParam}`);
         const data = await res.json();
 
         if (data.isNightBlocked) {
@@ -2537,7 +2695,7 @@
 
         const times = data.availableTimes || [];
         if (!times.length) {
-          container.innerHTML = '<div class="slots-empty">Sem horários livres para esta data. Por favor escolhe outro dia.</div>';
+          container.innerHTML = '<div class="slots-empty">Sem horários livres para esta data. Por favor escolhe outro dia ou outro barbeiro.</div>';
           return;
         }
 
@@ -2577,18 +2735,19 @@
       try {
         const payload = {
           serviceId: STATE.selectedServiceId,
+          barberId: STATE.selectedBarberId || "any",
           date: STATE.selectedDate,
           startTime: STATE.selectedTime,
           clientName: name,
           clientPhone: phone,
           clientInstagram: insta || null,
-          notes: notes || null
+          notes: notes || null,
         };
 
         const res = await fetch("/api/bairro/book", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          body: JSON.stringify(payload),
         });
         const data = await res.json();
 
@@ -2614,8 +2773,10 @@
 
         const srv = STATE.services.find((s) => s.id === STATE.selectedServiceId);
         const srvName = srv ? srv.name : "Corte";
+        const barberNameText = data.appointment?.barberName || (STATE.selectedBarberId === "barber-sandro-miguel" ? "Sandro Miguel" : "Diogo Viegas");
         document.getElementById("modal-success-desc").innerHTML = `
           <strong>${srvName}</strong> marcado com sucesso!<br>
+          💈 Barbeiro: <strong style="color:var(--gold)">${barberNameText}</strong><br>
           📅 <strong>${new Date(STATE.selectedDate).toLocaleDateString("pt-PT")}</strong> às <strong>${STATE.selectedTime}h</strong>.<br>
           Nome: <strong>${name}</strong><br><br>
           📍 Centro comercial São Julião, Setúbal.<br>

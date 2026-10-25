@@ -248,6 +248,47 @@ async function notify(userId, title, message, type = "INFO", actionUrl = null, d
   }
 }
 
+const DEFAULT_BARBER_ID = "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9";
+const DEFAULT_BARBER_NAME = "Diogo Viegas";
+const SANDRO_BARBER_ID = "barber-sandro-miguel";
+const SANDRO_BARBER_NAME = "Sandro Miguel";
+
+function overlaps(aStart, aEnd, bStart, bEnd) {
+  return aStart < bEnd && aEnd > bStart;
+}
+
+async function getActiveBarbers() {
+  const staff = await db.users().find({ role: { $in: ["ADMIN", "BARBER"] } }).toArray();
+  if (!staff.length) {
+    return [
+      { id: DEFAULT_BARBER_ID, name: DEFAULT_BARBER_NAME, role: "ADMIN" },
+      { id: SANDRO_BARBER_ID, name: SANDRO_BARBER_NAME, role: "BARBER" },
+    ];
+  }
+  return staff.map((u) => ({
+    id: u.id,
+    name: u.name,
+    role: u.role,
+    phone: u.phone || "",
+    username: u.username || (u.role === "ADMIN" ? "admin" : "sandro"),
+  }));
+}
+
+function isBarberBusy(barberId, startMins, endMins, appts, blocked) {
+  const hasAppt = appts.some((a) => {
+    const aBarberId = a.barber_id || DEFAULT_BARBER_ID;
+    return aBarberId === barberId && overlaps(startMins, endMins, timeToMinutes(a.start_time), timeToMinutes(a.end_time));
+  });
+  if (hasAppt) return true;
+
+  const hasBlock = blocked.some((b) => {
+    const bBarberId = b.barber_id || "all";
+    const matchesBarber = bBarberId === "all" || bBarberId === barberId;
+    return matchesBarber && overlaps(startMins, endMins, timeToMinutes(b.start_time), timeToMinutes(b.end_time));
+  });
+  return hasBlock;
+}
+
 async function checkAndNotifyFullDay(date) {
   try {
     const sched = getDaySchedule(date);
@@ -261,6 +302,7 @@ async function checkAndNotifyFullDay(date) {
 
     const appts = await db.appointments().find({ date, status: "SCHEDULED" }).toArray();
     const blocked = await db.blocked_times().find({ date }).toArray();
+    const activeBarbers = await getActiveBarbers();
 
     let freeCount = 0;
     for (let mins = openMin; mins + 50 <= closeMin; mins += 60) {
@@ -269,10 +311,8 @@ async function checkAndNotifyFullDay(date) {
       const timeStr = minutesToTime(mins);
       if (new Date(`${date}T${timeStr}:00`).getTime() < Date.now()) continue;
 
-      const busy =
-        appts.some((a) => overlaps(mins, end, timeToMinutes(a.start_time), timeToMinutes(a.end_time))) ||
-        blocked.some((b) => overlaps(mins, end, timeToMinutes(b.start_time), timeToMinutes(b.end_time)));
-      if (!busy) freeCount++;
+      const freeBarbers = activeBarbers.filter((b) => !isBarberBusy(b.id, mins, end, appts, blocked));
+      if (freeBarbers.length > 0) freeCount++;
     }
 
     // Se não houver vagas livres restantes e tiver agendamentos marcados
@@ -281,12 +321,11 @@ async function checkAndNotifyFullDay(date) {
       const formattedDate = dateObj.toLocaleDateString("pt-PT", { day: "numeric", month: "long" });
       const dedupeKey = `full_day_${date}`;
 
-      const staffMembers = await db.users().find({ role: { $in: ["ADMIN", "BARBER"] } }).toArray();
-      for (const staff of staffMembers) {
+      for (const staff of activeBarbers) {
         await notify(
           staff.id,
           "🔥 Agenda Lotada!",
-          `No dia ${formattedDate} já tens a agenda cheia! Todas as vagas do dia estão reservadas.`,
+          `No dia ${formattedDate} a barbearia está com lotação esgotada! Todas as vagas dos barbeiros estão reservadas.`,
           "AGENDA_FULL",
           `/dashboard?tab=agenda&date=${date}`,
           dedupeKey
@@ -298,9 +337,6 @@ async function checkAndNotifyFullDay(date) {
   }
 }
 
-function overlaps(aStart, aEnd, bStart, bEnd) {
-  return aStart < bEnd && aEnd > bStart;
-}
 
 async function offerNextWaitlistEntry(date, startTime) {
   const startMinutes = timeToMinutes(startTime);
@@ -417,16 +453,24 @@ app.post("/api/auth/login", async (req, res) => {
 
     let user;
     if (identifier === "admin") {
-      user = await db.users().findOne({ role: "ADMIN" });
+      user = await db.users().findOne({ $or: [{ role: "ADMIN" }, { username: "admin" }] });
+    } else if (identifier === "sandro") {
+      user = await db.users().findOne({ $or: [{ username: "sandro" }, { email: "sandro@viegasbarber.pt" }, { id: SANDRO_BARBER_ID }] });
     } else {
-      user = await db.users().findOne({ email: identifier });
+      user = await db.users().findOne({
+        $or: [
+          { email: identifier },
+          { username: identifier },
+          { phone: identifier },
+        ],
+      });
     }
 
     if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Utilizador ou palavra-passe da Viegas Barber incorretos." });
     }
 
-    req.session.user = { id: user.id, name: user.name, email: user.email, role: user.role };
+    req.session.user = { id: user.id, name: user.name, email: user.email, role: user.role, phone: user.phone || "" };
     const token = createAuthToken(user);
     res.cookie("vb_token", token, {
       maxAge: SESSION_MAX_AGE,
@@ -446,6 +490,15 @@ app.post("/api/auth/login", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Não foi possível iniciar sessão." });
+  }
+});
+
+app.get("/api/barbers", async (_req, res) => {
+  try {
+    const barbers = await getActiveBarbers();
+    res.json(barbers);
+  } catch (err) {
+    res.status(500).json({ error: "Erro ao listar barbeiros" });
   }
 });
 
@@ -634,6 +687,8 @@ app.get("/api/appointments/availability", async (req, res) => {
     const earliest = Date.now();
     const isNight = isNighttimeBlocked();
 
+    const requestedBarberId = String(req.query.barberId || "any");
+    const activeBarbers = await getActiveBarbers();
     const appointments = await db.appointments().find({ date: dateStr, status: "SCHEDULED" }).toArray();
     const blocked = await db.blocked_times().find({ date: dateStr }).toArray();
     const slotDuration = 50 * (isDuo ? 2 : 1);
@@ -646,10 +701,14 @@ app.get("/api/appointments/availability", async (req, res) => {
       if (closeMinutes > lunchEnd && overlaps(mins, end, lunchStart, lunchEnd)) continue;
       const startStr = minutesToTime(mins);
       if (new Date(`${dateStr}T${startStr}:00`).getTime() < earliest) continue;
-      const busy =
-        appointments.some((a) => overlaps(mins, end, timeToMinutes(a.start_time), timeToMinutes(a.end_time))) ||
-        blocked.some((b) => overlaps(mins, end, timeToMinutes(b.start_time), timeToMinutes(b.end_time)));
-      if (!busy) availableTimes.push(startStr);
+
+      if (requestedBarberId !== "any" && requestedBarberId !== "") {
+        const busy = isBarberBusy(requestedBarberId, mins, end, appointments, blocked);
+        if (!busy) availableTimes.push(startStr);
+      } else {
+        const freeBarbers = activeBarbers.filter((b) => !isBarberBusy(b.id, mins, end, appointments, blocked));
+        if (freeBarbers.length > 0) availableTimes.push(startStr);
+      }
     }
 
     res.json({
@@ -1326,10 +1385,22 @@ app.post("/api/assistant", async (req, res) => {
 
 app.get("/api/admin/today", requireStaff, async (req, res) => {
   const date = todayDate();
-  const rows = await db.appointments().find({ date }).sort({ start_time: 1 }).toArray();
+  const barberId = req.query.barberId;
+  const query = { date };
+  if (barberId && barberId !== "all" && barberId !== "any") {
+    if (barberId === DEFAULT_BARBER_ID) {
+      query.$or = [{ barber_id: DEFAULT_BARBER_ID }, { barber_id: { $exists: false } }, { barber_id: null }];
+    } else {
+      query.barber_id = barberId;
+    }
+  }
+
+  const rows = await db.appointments().find(query).sort({ start_time: 1 }).toArray();
   for (const a of rows) {
     const s = await db.services().findOne({ id: a.service_id });
     const u = await db.users().findOne({ id: a.user_id });
+    a.barber_id = a.barber_id || DEFAULT_BARBER_ID;
+    a.barber_name = a.barber_name || (a.barber_id === SANDRO_BARBER_ID ? SANDRO_BARBER_NAME : DEFAULT_BARBER_NAME);
     a.service_name = s?.name || "Corte";
     a.price = Number(s?.price) || 12;
     a.duration = Number(s?.duration_minutes) || 45;
@@ -1337,7 +1408,7 @@ app.get("/api/admin/today", requireStaff, async (req, res) => {
     a.phone = a.client_phone || u?.phone || "";
     a.email = u?.email || "";
     if (a.phone) {
-      const waMsg = `✂️ *Viegas Barber*\n\nOlá ${a.client_name}! A confirmar o teu corte (${a.service_name}) para hoje às *${a.start_time}* com o Diogo. Contamos contigo!`;
+      const waMsg = `✂️ *Viegas Barber*\n\nOlá ${a.client_name}! A confirmar o teu corte (${a.service_name}) para hoje às *${a.start_time}* com o ${a.barber_name}. Contamos contigo!`;
       a.whatsAppUrl = buildWhatsAppLink(a.phone, waMsg);
     }
   }
@@ -1346,10 +1417,22 @@ app.get("/api/admin/today", requireStaff, async (req, res) => {
 
 app.get("/api/admin/appointments", requireStaff, async (req, res) => {
   const date = String(req.query.date || todayDate());
-  const rows = await db.appointments().find({ date }).sort({ start_time: 1 }).toArray();
+  const barberId = req.query.barberId;
+  const query = { date };
+  if (barberId && barberId !== "all" && barberId !== "any") {
+    if (barberId === DEFAULT_BARBER_ID) {
+      query.$or = [{ barber_id: DEFAULT_BARBER_ID }, { barber_id: { $exists: false } }, { barber_id: null }];
+    } else {
+      query.barber_id = barberId;
+    }
+  }
+
+  const rows = await db.appointments().find(query).sort({ start_time: 1 }).toArray();
   for (const a of rows) {
     const s = await db.services().findOne({ id: a.service_id });
     const u = await db.users().findOne({ id: a.user_id });
+    a.barber_id = a.barber_id || DEFAULT_BARBER_ID;
+    a.barber_name = a.barber_name || (a.barber_id === SANDRO_BARBER_ID ? SANDRO_BARBER_NAME : DEFAULT_BARBER_NAME);
     a.service_name = s?.name || "Corte";
     a.price = Number(s?.price) || 12;
     a.duration = Number(s?.duration_minutes) || 45;
@@ -1357,7 +1440,7 @@ app.get("/api/admin/appointments", requireStaff, async (req, res) => {
     a.phone = a.client_phone || u?.phone || "";
     a.email = u?.email || "";
     if (a.phone) {
-      const waMsg = `✂️ *Viegas Barber*\n\nOlá ${a.client_name}! A confirmar a tua marcação (${a.service_name}) para ${a.date} às *${a.start_time}* com o Diogo. Contamos contigo!`;
+      const waMsg = `✂️ *Viegas Barber*\n\nOlá ${a.client_name}! A confirmar a tua marcação (${a.service_name}) para ${a.date} às *${a.start_time}* com o ${a.barber_name}. Contamos contigo!`;
       a.whatsAppUrl = buildWhatsAppLink(a.phone, waMsg);
     }
   }
@@ -1404,9 +1487,18 @@ app.patch("/api/admin/appointments/:id", requireStaff, async (req, res) => {
 
 app.post("/api/admin/appointments", requireStaff, async (req, res) => {
   try {
-    const { clientName, clientPhone, serviceId, date, startTime, notes } = req.body || {};
+    const { clientName, clientPhone, serviceId, date, startTime, notes, barberId } = req.body || {};
     if (!clientName || !date || !startTime) {
       return res.status(400).json({ error: "Nome, data e hora são obrigatórios." });
+    }
+
+    const activeBarbers = await getActiveBarbers();
+    let assignedBarber = null;
+    if (barberId) {
+      assignedBarber = activeBarbers.find((b) => b.id === barberId);
+    }
+    if (!assignedBarber) {
+      assignedBarber = activeBarbers.find((b) => b.id === req.session.user?.id) || activeBarbers[0];
     }
 
     const service = await db.services().findOne({ id: serviceId || "srv-corte-12" });
@@ -1439,6 +1531,8 @@ app.post("/api/admin/appointments", requireStaff, async (req, res) => {
       client_name: clientName.trim(),
       client_phone: clientPhone || null,
       service_id: sId,
+      barber_id: assignedBarber.id,
+      barber_name: assignedBarber.name,
       date,
       start_time: startTime,
       end_time: endTime,
@@ -1742,6 +1836,7 @@ app.post("/api/admin/blocked-times", requireStaff, async (req, res) => {
     date: req.body.date,
     start_time: req.body.startTime,
     end_time: req.body.endTime,
+    barber_id: req.body.barberId || "all",
     reason: req.body.reason || null,
     created_at: new Date().toISOString(),
   });
@@ -1841,13 +1936,24 @@ app.post("/api/bairro/book", async (req, res) => {
       return res.status(400).json({ error: "Este horário já passou. Por favor escolhe um horário futuro." });
     }
 
+    const requestedBarberId = String(body.barberId || "any");
+    const activeBarbers = await getActiveBarbers();
     const appts = await db.appointments().find({ date, status: "SCHEDULED" }).toArray();
     const blocked = await db.blocked_times().find({ date }).toArray();
-    if (
-      appts.some((a) => overlaps(startMins, endMins, timeToMinutes(a.start_time), timeToMinutes(a.end_time))) ||
-      blocked.some((b) => overlaps(startMins, endMins, timeToMinutes(b.start_time), timeToMinutes(b.end_time)))
-    ) {
-      return res.status(409).json({ error: "Este horário acabou de ser reservado por outro cliente. Por favor escolhe outro." });
+
+    let assignedBarber = null;
+    if (requestedBarberId !== "any" && requestedBarberId !== "") {
+      const busy = isBarberBusy(requestedBarberId, startMins, endMins, appts, blocked);
+      if (busy) {
+        return res.status(409).json({ error: "Este horário já não está disponível com o barbeiro selecionado. Por favor escolhe outro." });
+      }
+      assignedBarber = activeBarbers.find((b) => b.id === requestedBarberId) || { id: requestedBarberId, name: "Barbeiro" };
+    } else {
+      const freeBarbers = activeBarbers.filter((b) => !isBarberBusy(b.id, startMins, endMins, appts, blocked));
+      if (!freeBarbers.length) {
+        return res.status(409).json({ error: "Este horário acabou de ser reservado por outro cliente. Por favor escolhe outro." });
+      }
+      assignedBarber = freeBarbers.find((b) => b.id === DEFAULT_BARBER_ID) || freeBarbers[0];
     }
 
     let user = await db.users().findOne({ phone: clientPhone });
@@ -1877,7 +1983,7 @@ app.post("/api/bairro/book", async (req, res) => {
     }
 
     const apptId = id();
-    console.log(`[NOVA_MARCAÇÃO] ${clientName} (${clientPhone}) marcou ${service.name} para ${date} às ${startTime}`);
+    console.log(`[NOVA_MARCAÇÃO] ${clientName} (${clientPhone}) marcou ${service.name} com ${assignedBarber.name} para ${date} às ${startTime}`);
     await db.appointments().insertOne({
       id: apptId,
       user_id: user.id,
@@ -1885,6 +1991,8 @@ app.post("/api/bairro/book", async (req, res) => {
       client_phone: clientPhone,
       client_instagram: clientInstagram || null,
       service_id: service.id,
+      barber_id: assignedBarber.id,
+      barber_name: assignedBarber.name,
       date,
       start_time: startTime,
       end_time: endTime,
@@ -1895,12 +2003,11 @@ app.post("/api/bairro/book", async (req, res) => {
       created_at: new Date().toISOString(),
     });
 
-    const staffMembers = await db.users().find({ role: { $in: ["ADMIN", "BARBER"] } }).toArray();
-    for (const staff of staffMembers) {
+    for (const staff of activeBarbers) {
       await notify(
         staff.id,
         "✂️ Nova Marcação no Site!",
-        `${clientName} (${clientPhone}${clientInstagram ? ` • ${clientInstagram}` : ""}) marcou ${service.name} para ${date} às ${startTime}.`,
+        `${clientName} (${clientPhone}${clientInstagram ? ` • ${clientInstagram}` : ""}) marcou ${service.name} com ${assignedBarber.name} para ${date} às ${startTime}.`,
         "BOOKING",
         `/dashboard?tab=agenda&date=${date}`
       );
@@ -1919,6 +2026,8 @@ app.post("/api/bairro/book", async (req, res) => {
         serviceId: service.id,
         serviceName: service.name,
         servicePrice: service.price,
+        barberId: assignedBarber.id,
+        barberName: assignedBarber.name,
         date,
         startTime,
         endTime,
@@ -2042,8 +2151,10 @@ app.post("/api/bairro/cancel", async (req, res) => {
   }
 });
 
-app.get("/api/bairro/radar", async (_req, res) => {
+app.get("/api/bairro/radar", async (req, res) => {
   try {
+    const requestedBarberId = String(req.query.barberId || "any");
+    const activeBarbers = await getActiveBarbers();
     const settings = await getSettings();
     const days = [];
     const now = new Date();
@@ -2073,25 +2184,36 @@ app.get("/api/bairro/radar", async (_req, res) => {
         for (let mins = openMin; mins + 50 <= closeMin; mins += 60) {
           const end = mins + 50;
           if (closeMin > lunchEnd && overlaps(mins, end, lunchStart, lunchEnd)) continue;
-          totalPossible++;
           const timeStr = minutesToTime(mins);
           if (new Date(`${iso}T${timeStr}:00`).getTime() < Date.now()) continue;
 
-          const busy =
-            appts.some((a) => overlaps(mins, end, timeToMinutes(a.start_time), timeToMinutes(a.end_time))) ||
-            blocked.some((b) => overlaps(mins, end, timeToMinutes(b.start_time), timeToMinutes(b.end_time)));
-          if (!busy) freeCount++;
+          if (requestedBarberId !== "any" && requestedBarberId !== "") {
+            totalPossible++;
+            const busy = isBarberBusy(requestedBarberId, mins, end, appts, blocked);
+            if (!busy) freeCount++;
+          } else {
+            const freeInSlot = activeBarbers.filter((b) => !isBarberBusy(b.id, mins, end, appts, blocked)).length;
+            freeCount += freeInSlot;
+            totalPossible += activeBarbers.length;
+          }
         }
 
-        // Vaga Flash só faz sentido quando o dia está concorrido (poucas vagas) OU houve cancelamento nas últimas 2 horas
+        // Vaga Flash quando houve cancelamento nas últimas 2 horas
         const twoHoursAgo = new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString();
-        const recentCancelled = await db.appointments().findOne({
+        const cancelFilter = {
           date: iso,
           status: "CANCELLED",
-          created_at: { $gte: twoHoursAgo }
-        });
-        
-        // Só é Vaga Flash se tiver poucas vagas restantes (ex: <= 3 vagas) ou vaga de última hora
+          created_at: { $gte: twoHoursAgo },
+        };
+        if (requestedBarberId !== "any" && requestedBarberId !== "") {
+          cancelFilter.$or = [
+            { barber_id: requestedBarberId },
+            ...(requestedBarberId === DEFAULT_BARBER_ID ? [{ barber_id: { $exists: false } }, { barber_id: null }] : []),
+          ];
+        }
+
+        const recentCancelled = await db.appointments().findOne(cancelFilter);
+
         if (recentCancelled && freeCount > 0 && freeCount <= Math.max(3, Math.floor(totalPossible * 0.4))) {
           hasFlash = true;
         }
@@ -2108,7 +2230,7 @@ app.get("/api/bairro/radar", async (_req, res) => {
       });
     }
 
-    res.json({ days });
+    res.json({ days, barberId: requestedBarberId });
   } catch (e) {
     res.json({ days: [] });
   }

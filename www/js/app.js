@@ -1680,7 +1680,7 @@ const VB = (() => {
         `<div class="tabs"><button class="${method === "instagram" ? "active" : ""}" data-m="instagram">@ do Instagram</button><button class="${method === "gmail" ? "active" : ""}" data-m="gmail">Gmail / email</button></div>
          <p class="alert" id="err" style="display:none"></p>
          <form class="stack" id="form">
-           ${method === "instagram" ? `<div><label>@ do Instagram</label><input name="handle" placeholder="@o_teu_utilizador" required><p class="muted">Acesso do barbeiro: escreve <strong>admin</strong>.</p></div>` : `<div><label>Gmail ou email</label><input type="email" name="email" required></div>`}
+           ${method === "instagram" ? `<div><label>@ do Instagram ou Utilizador</label><input name="handle" placeholder="@o_teu_utilizador ou sandro / admin" required><p class="muted">Acesso do barbeiro: escreve <strong>admin</strong> ou <strong>sandro</strong>.</p></div>` : `<div><label>Gmail ou email</label><input type="email" name="email" required></div>`}
            <div><label>Palavra-passe da Viegas Barber</label><input type="password" name="password" required><p class="muted">Não é a palavra-passe do Instagram nem do Gmail.</p></div>
            <button class="brand-button btn" style="width:100%">Iniciar sessão</button>
          </form>`,
@@ -1695,11 +1695,12 @@ const VB = (() => {
       document.getElementById("form").onsubmit = async (e) => {
         e.preventDefault();
         const fd = new FormData(e.target);
+        const rawHandle = String(fd.get("handle") || "").replace(/^@/, "").toLowerCase().trim();
         const identifier =
           method === "instagram"
-            ? String(fd.get("handle") || "").replace(/^@/, "").toLowerCase().trim() === "admin"
-              ? "admin"
-              : `${String(fd.get("handle") || "").replace(/^@/, "").toLowerCase().trim()}@instagram.user`
+            ? (rawHandle === "admin" || rawHandle === "sandro")
+              ? rawHandle
+              : `${rawHandle}@instagram.user`
             : String(fd.get("email") || "").toLowerCase().trim();
         try {
           const data = await api("/api/auth/login", { method: "POST", body: { email: identifier, password: fd.get("password") } });
@@ -1910,9 +1911,14 @@ const VB = (() => {
       const urlDate = new URLSearchParams(location.search).get("date");
       let date = (tab === "hoje" && !urlDate) ? todayIso : (urlDate || todayIso);
 
+      const urlBarber = new URLSearchParams(location.search).get("barber");
+      const defaultBarber = user.id === "barber-sandro-miguel" ? "barber-sandro-miguel" : "all";
+      const currentBarberFilter = urlBarber || defaultBarber;
+
+      const barberParam = currentBarberFilter !== "all" ? `&barberId=${encodeURIComponent(currentBarberFilter)}` : "";
       const data = (tab === "hoje" && !urlDate)
-        ? await api("/api/admin/today")
-        : await api(`/api/admin/appointments?date=${date}`);
+        ? await api(`/api/admin/today?${barberParam ? barberParam.slice(1) : ""}`)
+        : await api(`/api/admin/appointments?date=${date}${barberParam}`);
       
       if (data.date && tab === "hoje" && !urlDate) {
         date = data.date;
@@ -1956,6 +1962,13 @@ const VB = (() => {
             </div>
           </div>
 
+          <!-- Filtro de Barbeiro na Dashboard -->
+          <div class="agenda-barber-filter-bar" style="display:flex;gap:.5rem;margin:0 0 1.2rem;overflow-x:auto;padding-bottom:2px">
+            <button type="button" class="btn ${currentBarberFilter === "all" ? "brand-button" : "btn-ghost"}" data-barber-filter="all" style="padding:.38rem .85rem;font-size:.82rem">👥 Ambos (Agenda Unida)</button>
+            <button type="button" class="btn ${currentBarberFilter === "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" ? "brand-button" : "btn-ghost"}" data-barber-filter="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" style="padding:.38rem .85rem;font-size:.82rem">💈 Diogo Viegas</button>
+            <button type="button" class="btn ${currentBarberFilter === "barber-sandro-miguel" ? "brand-button" : "btn-ghost"}" data-barber-filter="barber-sandro-miguel" style="padding:.38rem .85rem;font-size:.82rem">💈 Sandro Miguel</button>
+          </div>
+
           <div class="agenda-stats-bar">
             <div class="agenda-stat-card">
               <span class="agenda-stat-label">Agendados</span>
@@ -1994,6 +2007,12 @@ const VB = (() => {
                   <option value="srv-pack-completo-18">Pack Completo (18€)</option>
                 </select>
               </div>
+              <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Barbeiro *</label>
+                <select id="qa-barber" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff">
+                  <option value="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" ${user.id !== "barber-sandro-miguel" ? "selected" : ""}>Diogo Viegas</option>
+                  <option value="barber-sandro-miguel" ${user.id === "barber-sandro-miguel" ? "selected" : ""}>Sandro Miguel</option>
+                </select>
+              </div>
             </div>
             <div style="display:flex;gap:.5rem;justify-content:flex-end">
               <button type="button" class="btn btn-ghost" id="qa-cancel" style="padding:.4rem .8rem;font-size:.8rem">Cancelar</button>
@@ -2003,9 +2022,16 @@ const VB = (() => {
 
           <div id="quick-block-panel" style="display:none;background:var(--card-bg, #12141c);border:1px solid rgba(239,68,68,0.3);border-radius:12px;padding:1rem;margin-bottom:1.2rem">
             <h4 style="margin:0 0 .8rem;color:#ef4444;font-size:.95rem">⛔ Bloquear Horário (${date.split("-").reverse().join("/")})</h4>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-bottom:.8rem">
+            <div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(130px, 1fr));gap:.6rem;margin-bottom:.8rem">
               <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Hora Início *</label><input type="time" id="qb-start" value="14:00" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
               <div><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Hora Fim *</label><input type="time" id="qb-end" value="15:00" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff"></div>
+              <div style="grid-column:1/-1"><label style="font-size:.75rem;color:var(--muted);display:block;margin-bottom:.2rem">Barbeiro a Bloquear</label>
+                <select id="qb-barber" style="width:100%;padding:.45rem;border-radius:6px;border:1px solid var(--border);background:rgba(0,0,0,0.3);color:#fff">
+                  <option value="all">Ambos (Toda a Barbearia)</option>
+                  <option value="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9">Apenas Diogo Viegas</option>
+                  <option value="barber-sandro-miguel">Apenas Sandro Miguel</option>
+                </select>
+              </div>
             </div>
             <div style="display:flex;gap:.5rem;justify-content:flex-end">
               <button type="button" class="btn btn-ghost" id="qb-cancel" style="padding:.4rem .8rem;font-size:.8rem">Cancelar</button>
@@ -2039,6 +2065,9 @@ const VB = (() => {
                     <div class="agenda-card-main-col">
                       <div class="agenda-client-name-row">
                         <span class="agenda-client-name">${escapeHtml(a.client_name)}</span>
+                        <span style="font-size:.72rem;padding:2px 7px;border-radius:999px;background:rgba(212,175,55,0.12);color:var(--accent);font-weight:700;border:1px solid rgba(212,175,55,0.25);margin-left:.4rem">
+                          💈 ${escapeHtml(a.barber_name || (a.barber_id === "barber-sandro-miguel" ? "Sandro Miguel" : "Diogo Viegas"))}
+                        </span>
                         ${statusBadge}
                       </div>
 
@@ -2282,10 +2311,25 @@ const VB = (() => {
         const targetDate = btn.dataset.navDate;
         if (!targetDate) return;
         const tabTarget = targetDate === todayIso ? "hoje" : "agenda";
-        history.pushState(null, "", `/dashboard?tab=${tabTarget}&date=${targetDate}`);
+        const currentUrl = new URL(location.href);
+        currentUrl.searchParams.set("tab", tabTarget);
+        currentUrl.searchParams.set("date", targetDate);
+        history.pushState(null, "", currentUrl.toString());
         pageDashboard();
       });
     });
+
+    document.querySelectorAll("[data-barber-filter]").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const bVal = btn.dataset.barberFilter;
+        const currentUrl = new URL(location.href);
+        currentUrl.searchParams.set("barber", bVal);
+        history.pushState(null, "", currentUrl.toString());
+        pageDashboard();
+      });
+    });
+
     if (!window.__dashPopstateBound) {
       window.__dashPopstateBound = true;
       window.addEventListener("popstate", () => {
@@ -2313,6 +2357,7 @@ const VB = (() => {
         const phone = document.getElementById("qa-phone")?.value?.trim();
         const time = document.getElementById("qa-time")?.value;
         const serviceId = document.getElementById("qa-service")?.value;
+        const barberId = document.getElementById("qa-barber")?.value;
         const urlDate = new URLSearchParams(location.search).get("date");
         const apptDate = (tab === "hoje" && !urlDate) ? todayIso : (urlDate || todayIso);
 
@@ -2328,6 +2373,7 @@ const VB = (() => {
               clientName: name,
               clientPhone: phone,
               serviceId,
+              barberId,
               date: apptDate,
               startTime: time,
             },
@@ -2352,6 +2398,7 @@ const VB = (() => {
       document.getElementById("qb-save")?.addEventListener("click", async () => {
         const startTime = document.getElementById("qb-start")?.value;
         const endTime = document.getElementById("qb-end")?.value;
+        const barberId = document.getElementById("qb-barber")?.value || "all";
         const urlDate = new URLSearchParams(location.search).get("date");
         const blockDate = (tab === "hoje" && !urlDate) ? todayIso : (urlDate || todayIso);
 
@@ -2367,6 +2414,7 @@ const VB = (() => {
               date: blockDate,
               startTime,
               endTime,
+              barberId,
               reason: "Bloqueio Manual",
             },
           });

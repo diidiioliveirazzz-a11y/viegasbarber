@@ -17,7 +17,9 @@
     "created_at": "2026-10-13T11:08:26.900Z",
     "updated_at": "2026-10-13T11:08:30.359Z",
     "reminder_sent": true,
-    "review_available_at": "2026-10-14T18:11:16.314Z"
+    "review_available_at": "2026-10-14T18:11:16.314Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "adaad4fa-d36d-4110-9ac5-ecdc4fed48de",
@@ -35,7 +37,9 @@
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
     "created_at": "2026-10-13T11:04:46.942Z",
-    "updated_at": "2026-10-13T11:04:46.942Z"
+    "updated_at": "2026-10-13T11:04:46.942Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace500e952b51ab5ce46585",
@@ -52,7 +56,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T15:36:46.469Z"
+    "created_at": "2026-10-13T15:36:46.469Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace546f952b51ab5ce46588",
@@ -69,7 +75,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T15:55:27.180Z"
+    "created_at": "2026-10-13T15:55:27.180Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace5482952b51ab5ce4658b",
@@ -86,7 +94,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T15:55:46.500Z"
+    "created_at": "2026-10-13T15:55:46.500Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace552c952b51ab5ce4658e",
@@ -103,7 +113,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T15:58:36.906Z"
+    "created_at": "2026-10-13T15:58:36.906Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace5541952b51ab5ce46590",
@@ -121,7 +133,9 @@
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
     "created_at": "2026-10-13T15:58:57.397Z",
-    "updated_at": "2026-10-13T18:18:41.618Z"
+    "updated_at": "2026-10-13T18:18:41.618Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace707c9ec37743ba7ccdb6",
@@ -138,7 +152,9 @@
     "notes": "Corte chato kkk",
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T17:55:08.957Z"
+    "created_at": "2026-10-13T17:55:08.957Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace904a8045e03bf915e015",
@@ -155,7 +171,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T20:10:50.646Z"
+    "created_at": "2026-10-13T20:10:50.646Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace959e8045e03bf915e018",
@@ -172,7 +190,9 @@
     "notes": "Cabelo grande cacheado",
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T20:33:34.923Z"
+    "created_at": "2026-10-13T20:33:34.923Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6ace9e17680d25cd50808406",
@@ -189,7 +209,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T21:09:43.002Z"
+    "created_at": "2026-10-13T21:09:43.002Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6acea039680d25cd50808409",
@@ -206,7 +228,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T21:18:49.682Z"
+    "created_at": "2026-10-13T21:18:49.682Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6acea30d680d25cd5080840c",
@@ -223,7 +247,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T21:30:53.085Z"
+    "created_at": "2026-10-13T21:30:53.085Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6acea916b915317da9d2f4e0",
@@ -240,7 +266,9 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T21:56:38.049Z"
+    "created_at": "2026-10-13T21:56:38.049Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   },
   {
     "_id": "6acea950b915317da9d2f4e3",
@@ -257,6 +285,8 @@
     "notes": null,
     "created_via": "BAIRRO",
     "loyalty_awarded": false,
-    "created_at": "2026-10-13T21:57:36.641Z"
+    "created_at": "2026-10-13T21:57:36.641Z",
+    "barber_id": "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
+    "barber_name": "Diogo Viegas"
   }
 ]

@@ -7,7 +7,8 @@
     "password": "$2b$12$wjmN/4usOxbDoMaWQXw2iO0rSMn9L0SYf7KiNLM5VekKwWw9zJyvK",
     "role": "ADMIN",
     "created_at": "2026-10-09T15:54:07.760Z",
-    "updated_at": "2026-10-09T15:54:07.760Z"
+    "updated_at": "2026-10-09T15:54:07.760Z",
+    "username": "admin"
   },
   {
     "_id": "901f1004-0602-4399-ad6d-40bb675c1437",
@@ -149,5 +150,17 @@
     "email": "bairro_932531423@bairro.viegasbarber.pt",
     "role": "CLIENT",
     "created_at": "2026-10-13T21:57:36.625Z"
+  },
+  {
+    "_id": "barber-sandro-miguel",
+    "id": "barber-sandro-miguel",
+    "name": "Sandro Miguel",
+    "username": "sandro",
+    "email": "sandro@viegasbarber.pt",
+    "phone": "934172912",
+    "password": "$2b$12$9dloGkRVSrutg3hyXr8F6./fZt2Go3PRqfO0mRodsm/MU4L/9qLWS",
+    "role": "BARBER",
+    "created_at": "2026-10-25T20:37:48.990Z",
+    "updated_at": "2026-10-25T20:37:49.017Z"
   }
 ]
