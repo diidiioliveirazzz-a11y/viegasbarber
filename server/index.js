@@ -2163,7 +2163,7 @@ app.post("/api/bairro/cancel", async (req, res) => {
 
 app.get("/api/bairro/radar", async (req, res) => {
   try {
-    const requestedBarberId = String(req.query.barberId || "any");
+    const requestedBarberId = String(req.query.barberId || DEFAULT_BARBER_ID);
     const activeBarbers = await getActiveBarbers();
     const settings = await getSettings();
     const days = [];
