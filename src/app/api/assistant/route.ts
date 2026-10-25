@@ -84,17 +84,34 @@ export async function POST(req: Request) {
     }
 
 
-    // 5. QUEM É O DIOGO VIEGAS / O BARBEIRO
+    // 5. EQUIPA / DIOGO VIEGAS / SANDRO MIGUEL
+    if (norm.includes("sandro") || norm.includes("sandro miguel") || norm.includes("miguel")) {
+      return NextResponse.json({
+        reply: `💈 **Sandro Miguel** (@sandro_miguel22_):\n\nO Sandro é barbeiro oficial na equipa da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), corte à tesoura, barba/barboterapia e styling moderno.\n• **Instagram**: @sandro_miguel22_\n• **Contacto**: 934 172 912\n• **Horário & Preços**: Idênticos aos da barbearia.\n\n👉 Podes agendar diretamente com o Sandro escolhendo o seu perfil no Passo 2 do agendamento!`,
+      });
+    }
+
     if (
       norm.includes("diogo") ||
-      norm.includes("barbeiro") ||
-      norm.includes("quem e") ||
+      norm.includes("viegas") ||
       norm.includes("dono") ||
-      norm.includes("experiencia") ||
-      norm.includes("especialidade")
+      norm.includes("fundador")
     ) {
       return NextResponse.json({
-        reply: `💈 **Diogo Viegas — Master Barber & Fundador:**\n\nO Diogo é o barbeiro exclusivo da Viegas Barber. Não há rotatividade de profissionais: és sempre atendido pessoalmente por ele.\n\n        • **Especialidades:** Degradês milimétricos (Skin/Taper/Low Fade), barboterapia com toalha quente e óleos essenciais, e cortes clássicos à tesoura.\n• Podes conhecer o portfólio completo na página **"O Diogo"**!`,
+        reply: `💈 **Diogo Viegas — Master Barber & Fundador:**\n\nO Diogo é o fundador da Viegas Barber.\n• **Especialidades:** Degradês milimétricos (Skin/Taper/Low Fade), barboterapia tradicional com toalha quente e cortes clássicos à tesoura.\n• **Instagram**: @v_barber8\n• **WhatsApp**: ${settings.phone}\n\n👉 Podes agendar diretamente com o Diogo no Passo 2 da marcação!`,
+      });
+    }
+
+    if (
+      norm.includes("barbeiro") ||
+      norm.includes("barbeiros") ||
+      norm.includes("equipa") ||
+      norm.includes("staff") ||
+      norm.includes("quem e") ||
+      norm.includes("quem sao")
+    ) {
+      return NextResponse.json({
+        reply: `💈 **A Equipa da Viegas Barber:**\n\nA barbearia conta com dois profissionais dedicados:\n\n• **Diogo Viegas** (@v_barber8) — Fundador, mestre em fades milimétricos, tesoura e barboterapia.\n• **Sandro Miguel** (@sandro_miguel22_) — Barbeiro oficial, especialista em degradês, barba e styling.\n\nAmbos partilham a mesma tabela de preços e dedicação total ao cliente!`,
       });
     }
 

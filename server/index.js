@@ -1322,13 +1322,37 @@ app.post("/api/assistant", async (req, res) => {
 
   if (norm.includes("ola") || norm.includes("boas") || norm === "oi" || norm.includes("bom dia") || norm.includes("boa tarde") || norm.includes("boa noite")) {
     return res.json({
-      reply: `Olá! 👋 Sou o assistente virtual da **Viegas Barber**.\n\nPosso ajudar-te com informações sobre o preçário, horários, localização, lista de espera ou marcações com o Diogo. O que gostarias de saber?`,
+      reply: `Olá! 👋 Sou o assistente virtual da **Viegas Barber**.\n\nPosso ajudar-te com informações sobre a nossa equipa (**Diogo Viegas** e **Sandro Miguel**), preçário, horários, localização, radar de vagas em tempo real ou marcações. O que gostarias de saber?`,
+    });
+  }
+
+  if (norm.includes("sandro") || norm.includes("sandro miguel") || norm.includes("miguel")) {
+    return res.json({
+      reply: `💈 **Sandro Miguel** (@sandro_miguel22_):\n\nO Sandro é barbeiro oficial na equipa da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), corte à tesoura, barba/barboterapia e styling moderno.\n• **Instagram**: @sandro_miguel22_\n• **Contacto**: 934 172 912\n• **Horário & Preços**: Idênticos aos da barbearia.\n\n👉 Para marcar com o Sandro, clica em **"MARCAR AGORA"** e seleciona o **Sandro Miguel** no Passo 2!`,
+    });
+  }
+
+  if (norm.includes("diogo") || norm.includes("viegas") || norm.includes("fundador")) {
+    return res.json({
+      reply: `💈 **Diogo Viegas** (@v_barber8):\n\nO Diogo é o fundador da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), barboterapia tradicional com toalha quente, cortes à tesoura e styling de alta precisão.\n• **Instagram**: @v_barber8\n• **WhatsApp**: ${settings.whatsapp || settings.phone || "+351 939 504 261"}\n\n👉 Para marcar com o Diogo, clica em **"MARCAR AGORA"** e escolhe o **Diogo Viegas** no Passo 2!`,
+    });
+  }
+
+  if (norm.includes("equipa") || norm.includes("barbeiro") || norm.includes("barbeiros") || norm.includes("staff") || norm.includes("quem corta") || norm.includes("quem sao") || norm.includes("quem e")) {
+    return res.json({
+      reply: `💈 **A Equipa da Viegas Barber:**\n\nA barbearia conta com dois profissionais dedicados ao teu estilo:\n\n• **Diogo Viegas** (@v_barber8) — Fundador, especialista em fades milimétricos, tesoura e barboterapia.\n• **Sandro Miguel** (@sandro_miguel22_) — Barbeiro oficial, especialista em degradês, barba e styling.\n\nAmbos partilham a mesma tabela de preços e dedicação total. No Passo 2 do agendamento, podes escolher com qual barbeiro preferes o teu corte!`,
+    });
+  }
+
+  if (norm.includes("radar") || norm.includes("vaga") || norm.includes("vagas") || norm.includes("flash") || norm.includes("tempo real") || norm.includes("desmarc")) {
+    return res.json({
+      reply: `⚡ **Radar de Vagas em Tempo Real:**\n\nNo topo da nossa página inicial tens um **Radar ao Vivo** com as vagas disponíveis para os próximos dias!\n\n• Podes alternar facilmente entre o radar do **Diogo Viegas** e o do **Sandro Miguel**.\n• Se surgir uma desmarcação com menos de 2 horas de antecedência, aparece como **Vaga Flash ⚡**, permitindo-te marcar imediatamente na hora!\n\nClica no dia pretendido no radar para ires direto ao agendamento com esse barbeiro.`,
     });
   }
 
   if (norm.includes("fideliz") || norm.includes("ponto") || norm.includes("recompensa") || norm.includes("cartao") || norm.includes("desconto")) {
     return res.json({
-      reply: `🎁 **Programa de Fidelização Viegas Barber:**\n\nAo fim de **5 cortes** realizados com o Diogo, ganhas direito a uma destas vantagens à tua escolha:\n• **3€ de Desconto** no teu próximo corte de cabelo ✂️\n• **OU 4€ de Desconto** na compra de qualquer cera para cabelo da loja 💈\n\nPodes acompanhar o teu número de cortes e progresso diretamente no separador **Fidelização** no menu!`,
+      reply: `🎁 **Programa de Fidelização Viegas Barber:**\n\nAo fim de **5 cortes** realizados na Viegas Barber (com o Diogo ou com o Sandro), ganhas direito a uma destas vantagens à tua escolha:\n• **3€ de Desconto** no teu próximo corte de cabelo ✂️\n• **OU 4€ de Desconto** na compra de qualquer cera para cabelo da loja 💈\n\nPodes acompanhar o teu número de cortes e progresso diretamente no separador **Fidelização** no menu!`,
     });
   }
 
@@ -1336,31 +1360,31 @@ app.post("/api/assistant", async (req, res) => {
     const services = await db.services().find({ isActive: true }).sort({ price: 1 }).toArray();
     const list = services.map((s) => `• **${s.name}**: ${Number(s.price).toFixed(2)}€ (~${s.duration} min)`).join("\n");
     return res.json({
-      reply: `✂️ **Preçário Oficial Viegas Barber:**\n\n${list}\n\n👉 Podes agendar diretamente clicando em **"Marcar Agora"** no topo da página!`,
+      reply: `✂️ **Preçário Oficial Viegas Barber:**\n\n${list}\n\n👉 O preçário é exatamente o mesmo para o **Diogo Viegas** e para o **Sandro Miguel**. Podes agendar clicando em **"MARCAR AGORA"**!`,
     });
   }
 
   if (norm.includes("hora") || norm.includes("horario") || norm.includes("abre") || norm.includes("fecha") || norm.includes("almoco") || /\b(que horas|horarios)\b/.test(norm)) {
     return res.json({
-      reply: `🕒 **Horário de Funcionamento:**\n\n• **Segunda-feira**: 09:00 — 19:00\n• **Terça-feira**: 09:00 — 20:00\n• **Quarta-feira**: 09:00 — 19:00\n• **Quinta-feira**: 09:00 — 19:00\n• **Sexta-feira**: 09:00 — 20:00\n• **Sábado**: 09:00 — 12:00\n• **Domingo**: Encerrado\n\n🥪 *Pausa de Almoço*: 13:00 — 13:30`,
+      reply: `🕒 **Horário de Funcionamento:**\n\n• **Segunda-feira**: 09:00 — 19:00\n• **Terça-feira**: 09:00 — 20:00\n• **Quarta-feira**: 09:00 — 19:00\n• **Quinta-feira**: 09:00 — 19:00\n• **Sexta-feira**: 09:00 — 20:00\n• **Sábado**: 09:00 — 12:00\n• **Domingo**: Encerrado\n\n🥪 *Pausa de Almoço*: 13:00 — 13:30\n\n*Nota*: Ambos os barbeiros cumprem este horário.`,
     });
   }
 
   if (norm.includes("morada") || norm.includes("localizacao") || norm.includes("onde") || norm.includes("contacto") || norm.includes("fica") || norm.includes("rua") || norm.includes("setubal") || norm.includes("instagram")) {
     return res.json({
-      reply: `📍 **Localização & Contactos:**\n\n• **Morada**: ${settings.address || "Centro comercial São Julião, Setúbal"}\n• **WhatsApp**: ${settings.whatsapp || settings.phone || "+351 939 504 261"}\n• **Instagram**: @v_barber8\n\nAtendimento exclusivo e individual com o Diogo Viegas em Setúbal.`,
+      reply: `📍 **Localização & Contactos:**\n\n• **Morada**: ${settings.address || "Centro comercial São Julião, Setúbal"}\n• **WhatsApp Barbearia**: ${settings.whatsapp || settings.phone || "+351 939 504 261"}\n• **Instagram Diogo**: @v_barber8\n• **Instagram Sandro**: @sandro_miguel22_\n\nAtendimento de excelência no Centro Comercial São Julião em Setúbal.`,
     });
   }
 
   if (norm.includes("marcar") || norm.includes("agendar") || norm.includes("marca") || norm.includes("como marcar")) {
     return res.json({
-      reply: `📅 **Como fazer a tua marcação:**\n\n1. Clica no botão **"MARCAR AGORA"** no topo do site.\n2. Escolhe o serviço pretendido.\n3. Seleciona o dia e o horário livre que preferires.\n4. Confirma os teus dados.\n\nRecebes confirmação imediata e podes notificar o Diogo pelo WhatsApp!`,
+      reply: `📅 **Como fazer a tua marcação no site:**\n\n1. Clica no botão **"MARCAR AGORA"** no topo.\n2. **Passo 1**: Escolhe o serviço pretendido.\n3. **Passo 2**: Escolhe o barbeiro com quem queres cortar (**Diogo Viegas** ou **Sandro Miguel**).\n4. **Passo 3**: Escolhe o dia e o horário livre pretendido.\n5. **Passo 4**: Confirma os teus dados de contacto.\n\nRecebes confirmação imediata e podes avisar o barbeiro pelo WhatsApp!`,
     });
   }
 
   if (norm.includes("whatsapp") || norm.includes("whats") || norm.includes("mensagem") || norm.includes("zap")) {
     return res.json({
-      reply: `💬 **WhatsApp da Barbearia:**\n\nPodes falar diretamente connosco pelo WhatsApp: **${settings.whatsapp || settings.phone || "+351 939 504 261"}**.\n\nAlém disso, quando fazes uma marcação no site, podes avisar o Diogo num só clique!`,
+      reply: `💬 **WhatsApp da Barbearia:**\n\nPodes falar diretamente connosco pelo WhatsApp: **${settings.whatsapp || settings.phone || "+351 939 504 261"}**.\n\nAlém disso, quando fazes uma marcação no site, podes avisar o barbeiro num só clique!`,
     });
   }
 
@@ -1370,22 +1394,16 @@ app.post("/api/assistant", async (req, res) => {
     });
   }
 
-  if (norm.includes("diogo") || norm.includes("barbeiro") || norm.includes("quem e")) {
-    return res.json({
-      reply: `💈 **Diogo Viegas** é o fundador e barbeiro exclusivo da Viegas Barber.\n\nEspecialista em degradês milimétricos (fades), barboterapia, cortes à tesoura e styling. Todo o atendimento é individual e sem pressas.`,
-    });
-  }
-
   if (norm.includes("loja") || norm.includes("produto") || norm.includes("cera") || norm.includes("pomada")) {
     const products = await db.products().find({}).limit(4).toArray();
     const list = products.map((p) => `• **${p.name}** (${Number(p.price).toFixed(2)}€)`).join("\n");
     return res.json({
-      reply: `🛍️ **Loja de Produtos:**\n\n${list}\n\nPodes reservar diretamente na página da Loja e levantar e pagar ao balcão com o Diogo.`,
+      reply: `🛍️ **Loja de Produtos:**\n\n${list}\n\nPodes reservar diretamente na página da Loja e levantar e pagar ao balcão na barbearia.`,
     });
   }
 
   res.json({
-    reply: `Posso ajudar-te com informações sobre o preçário, horários, localização, marcações ou produtos da loja. Como posso ajudar?`,
+    reply: `Posso ajudar-te com informações sobre a equipa (**Diogo Viegas** e **Sandro Miguel**), preçário, horários, localização, radar de vagas em tempo real ou produtos da loja. Como posso ajudar?`,
   });
 });
 

@@ -1746,14 +1746,7 @@
         <span>Escolhe o Barbeiro</span>
       </div>
       <div class="barbers-grid" id="barbers-container">
-        <div class="barber-card selected" data-barber-id="any">
-          <div class="barber-icon">⚡</div>
-          <div class="barber-info">
-            <span class="barber-name">Sem Preferência</span>
-            <span class="barber-desc">Primeiro disponível</span>
-          </div>
-        </div>
-        <div class="barber-card" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9">
+        <div class="barber-card selected" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9">
           <div class="barber-icon">💈</div>
           <div class="barber-info">
             <span class="barber-name">Diogo Viegas</span>
@@ -2090,7 +2083,7 @@
     const STATE = {
       services: [],
       selectedServiceId: null,
-      selectedBarberId: "any",
+      selectedBarberId: "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9",
       selectedDate: null,
       selectedTime: null,
       activeAppointments: [],
@@ -2892,16 +2885,16 @@
       }
     }
 
-    // Assistente Virtual AI (Diogo Viegas AI)
+    // Assistente Virtual AI (Viegas Barber AI)
     let assistantOpen = false;
     let assistantLoading = false;
     let assistantMessages = [
       {
         role: "assistant",
-        text: "Olá! Sou o assistente oficial da Viegas Barber 💈\nComo te posso ajudar hoje? Clica numa sugestão abaixo ou faz a tua pergunta:",
+        text: "Olá! Sou o assistente oficial da Viegas Barber 💈\nPosso ajudar-te com informações da equipa (Diogo Viegas e Sandro Miguel), preçário, horários, localização, radar de vagas e marcações!\nComo te posso ajudar hoje?",
       },
     ];
-    const quickSuggestions = ["✂️ Preçário", "🕒 Horários", "📍 Localização", "📅 Como marcar?", "💈 O Diogo"];
+    const quickSuggestions = ["✂️ Preçário", "🕒 Horários", "💈 A Equipa", "📍 Localização", "⚡ Radar Vagas", "📅 Como marcar?"];
 
     function escapeHtml(str) {
       if (!str) return "";
@@ -2937,7 +2930,7 @@
         host.innerHTML = `
           <button class="assistant-btn" id="open-assistant-btn" title="Falar com o assistente do Viegas">
             <span class="assistant-pulse"></span>
-            <span>💬 Diogo AI</span>
+            <span>💬 Viegas AI</span>
           </button>`;
         host.querySelector("#open-assistant-btn")?.addEventListener("click", () => {
           assistantOpen = true;

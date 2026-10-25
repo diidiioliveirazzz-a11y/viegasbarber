@@ -636,10 +636,10 @@ const VB = (() => {
   let assistantMessages = [
     {
       role: "assistant",
-      text: "Olá! Sou o assistente oficial da Viegas Barber 💈\nComo te posso ajudar hoje? Clica numa sugestão abaixo ou faz a tua pergunta:",
+      text: "Olá! Sou o assistente oficial da Viegas Barber 💈\nPosso ajudar-te com informações da equipa (Diogo Viegas e Sandro Miguel), preçário, horários, localização, radar de vagas e marcações!\nComo te posso ajudar hoje?",
     },
   ];
-  const quickSuggestions = ["✂️ Preçário", "🕒 Horários", "📍 Localização", "📅 Como marcar?", "💈 O Diogo"];
+  const quickSuggestions = ["✂️ Preçário", "🕒 Horários", "💈 A Equipa", "📍 Localização", "⚡ Radar Vagas", "📅 Como marcar?"];
 
   function mountAssistant() {
     let backdrop = document.getElementById("assistant-backdrop");
@@ -671,7 +671,7 @@ const VB = (() => {
         host.innerHTML = `
           <button class="assistant-btn" id="open-assistant-btn" title="Falar com o assistente">
             <span class="assistant-pulse"></span>
-            <span>💬 Diogo AI</span>
+            <span>💬 Viegas AI</span>
           </button>`;
         host.querySelector("#open-assistant-btn")?.addEventListener("click", () => {
           assistantOpen = true;
