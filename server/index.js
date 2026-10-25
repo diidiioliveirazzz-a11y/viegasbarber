@@ -448,7 +448,7 @@ app.get("/api/me", (req, res) => {
 
 app.post("/api/auth/login", async (req, res) => {
   try {
-    const identifier = String(req.body.email || "").toLowerCase().trim();
+    const identifier = String(req.body.email || req.body.username || "").toLowerCase().trim();
     const password = String(req.body.password || "");
     if (!identifier || !password) return res.status(400).json({ error: "Utilizador ou palavra-passe incorretos." });
 
