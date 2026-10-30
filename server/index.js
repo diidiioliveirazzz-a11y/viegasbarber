@@ -257,6 +257,19 @@ function overlaps(aStart, aEnd, bStart, bEnd) {
   return aStart < bEnd && aEnd > bStart;
 }
 
+function getBarberDaySchedule(barberId, dateStr) {
+  const base = getDaySchedule(dateStr);
+  if (base.closed) return base;
+  // O horário do Sandro no sábado termina às 18:00 (em vez das 12:00)
+  if ((barberId === SANDRO_BARBER_ID || barberId === "sandro") && base.dayOfWeek === 6) {
+    return {
+      ...base,
+      close: "18:00",
+    };
+  }
+  return base;
+}
+
 async function getActiveBarbers() {
   const staff = await db.users().find({ role: { $in: ["ADMIN", "BARBER"] } }).toArray();
   if (!staff.length) {
@@ -716,23 +729,47 @@ app.get("/api/appointments/availability", async (req, res) => {
     const blocked = await db.blocked_times().find({ date: dateStr }).toArray();
     const slotDuration = 50 * (isDuo ? 2 : 1);
 
+    // Determinar horário de fecho máximo para a pesquisa de slots
+    let maxCloseMinutes = timeToMinutes(daySched.close);
+    if (requestedBarberId !== "any" && requestedBarberId !== "") {
+      const barberSched = getBarberDaySchedule(requestedBarberId, dateStr);
+      maxCloseMinutes = timeToMinutes(barberSched.close);
+    } else {
+      activeBarbers.forEach((b) => {
+        const bSched = getBarberDaySchedule(b.id, dateStr);
+        const bClose = timeToMinutes(bSched.close);
+        if (bClose > maxCloseMinutes) maxCloseMinutes = bClose;
+      });
+    }
+
     const availableTimes = [];
     // Vagas de 1 em 1 hora (passo de 60 min: 09:00, 10:00, 11:00, 12:00, 14:00, 15:00, 16:00, 17:00, 18:00)
-    for (let mins = openMinutes; mins + slotDuration <= closeMinutes; mins += 60) {
+    for (let mins = openMinutes; mins + slotDuration <= maxCloseMinutes; mins += 60) {
       const end = mins + slotDuration;
       // Salta se colidir com o almoço (13:00 - 13:30)
-      if (closeMinutes > lunchEnd && overlaps(mins, end, lunchStart, lunchEnd)) continue;
+      if (maxCloseMinutes > lunchEnd && overlaps(mins, end, lunchStart, lunchEnd)) continue;
       const startStr = minutesToTime(mins);
       if (new Date(`${dateStr}T${startStr}:00`).getTime() < earliest) continue;
 
       if (requestedBarberId !== "any" && requestedBarberId !== "") {
-        const busy = isBarberBusy(requestedBarberId, mins, end, appointments, blocked);
-        if (!busy) availableTimes.push(startStr);
+        const barberSched = getBarberDaySchedule(requestedBarberId, dateStr);
+        if (end <= timeToMinutes(barberSched.close)) {
+          const busy = isBarberBusy(requestedBarberId, mins, end, appointments, blocked);
+          if (!busy) availableTimes.push(startStr);
+        }
       } else {
-        const freeBarbers = activeBarbers.filter((b) => !isBarberBusy(b.id, mins, end, appointments, blocked));
+        const freeBarbers = activeBarbers.filter((b) => {
+          const bSched = getBarberDaySchedule(b.id, dateStr);
+          if (end > timeToMinutes(bSched.close)) return false;
+          return !isBarberBusy(b.id, mins, end, appointments, blocked);
+        });
         if (freeBarbers.length > 0) availableTimes.push(startStr);
       }
     }
+
+    const effectiveSchedule = requestedBarberId !== "any" && requestedBarberId !== ""
+      ? getBarberDaySchedule(requestedBarberId, dateStr)
+      : daySched;
 
     res.json({
       availableTimes: isNight ? [] : availableTimes,
@@ -740,7 +777,7 @@ app.get("/api/appointments/availability", async (req, res) => {
       nightMessage: isNight ? NIGHTTIME_BLOCK_MESSAGE : null,
       maxDate: maxBookableDate(isVip),
       today: todayDate(),
-      schedule: daySched,
+      schedule: effectiveSchedule,
     });
   } catch (error) {
     console.error(error);
@@ -1341,25 +1378,25 @@ app.post("/api/assistant", async (req, res) => {
 
   if (norm.includes("sandro") || norm.includes("sandro miguel") || norm.includes("miguel")) {
     return res.json({
-      reply: `💈 **Sandro Miguel** (@sandro_miguel22_):\n\nO Sandro é barbeiro oficial na equipa da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), corte à tesoura, barba/barboterapia e styling moderno.\n• **Instagram**: @sandro_miguel22_\n• **Contacto**: 934 172 912\n• **Horário & Preços**: Idênticos aos da barbearia.\n\n👉 Para marcar com o Sandro, clica em **"MARCAR AGORA"** e seleciona o **Sandro Miguel** no Passo 2!`,
+      reply: `💈 **Sandro Miguel** (@sandro_miguel22_):\n\nO Sandro é barbeiro oficial na equipa da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), corte à tesoura, barba/barboterapia e styling moderno.\n• **Instagram**: @sandro_miguel22_\n• **Contacto**: 934 172 912\n• **Horário**: Segunda a Sexta conforme a loja e **Sábado das 09:00 às 18:00**!\n• **Preços**: Idênticos aos da barbearia.\n\n👉 Para marcar com o Sandro, clica em **"MARCAR AGORA"** e seleciona o **Sandro Miguel** no Passo 2!`,
     });
   }
 
   if (norm.includes("diogo") || norm.includes("viegas") || norm.includes("fundador")) {
     return res.json({
-      reply: `💈 **Diogo Viegas** (@v_barber8):\n\nO Diogo é o fundador da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), barboterapia tradicional com toalha quente, cortes à tesoura e styling de alta precisão.\n• **Instagram**: @v_barber8\n• **WhatsApp**: ${settings.whatsapp || settings.phone || "+351 939 504 261"}\n\n👉 Para marcar com o Diogo, clica em **"MARCAR AGORA"** e escolhe o **Diogo Viegas** no Passo 2!`,
+      reply: `💈 **Diogo Viegas** (@v_barber8):\n\nO Diogo é o fundador da **Viegas Barber**!\n• **Especialidades**: Degradês milimétricos (fades), barboterapia tradicional com toalha quente, cortes à tesoura e styling de alta precisão.\n• **Instagram**: @v_barber8\n• **WhatsApp**: ${settings.whatsapp || settings.phone || "+351 939 504 261"}\n• **Horário**: Segunda a Sexta e Sábado das 09:00 às 12:00.\n\n👉 Para marcar com o Diogo, clica em **"MARCAR AGORA"** e escolhe o **Diogo Viegas** no Passo 2!`,
     });
   }
 
   if (norm.includes("equipa") || norm.includes("barbeiro") || norm.includes("barbeiros") || norm.includes("staff") || norm.includes("quem corta") || norm.includes("quem sao") || norm.includes("quem e")) {
     return res.json({
-      reply: `💈 **A Equipa da Viegas Barber:**\n\nA barbearia conta com dois profissionais dedicados ao teu estilo:\n\n• **Diogo Viegas** (@v_barber8) — Fundador, especialista em fades milimétricos, tesoura e barboterapia.\n• **Sandro Miguel** (@sandro_miguel22_) — Barbeiro oficial, especialista em degradês, barba e styling.\n\nAmbos partilham a mesma tabela de preços e dedicação total. No Passo 2 do agendamento, podes escolher com qual barbeiro preferes o teu corte!`,
+      reply: `💈 **A Equipa da Viegas Barber:**\n\nA barbearia conta com dois profissionais dedicados ao teu estilo:\n\n• **Diogo Viegas** (@v_barber8) — Fundador, especialista em fades milimétricos, tesoura e barboterapia (Sábado até às 12:00).\n• **Sandro Miguel** (@sandro_miguel22_) — Barbeiro oficial, especialista em degradês, barba e styling (**Sábado até às 18:00**).\n\nAmbos partilham a mesma tabela de preços e dedicação total. No Passo 2 do agendamento, podes escolher com qual barbeiro preferes o teu corte!`,
     });
   }
 
   if (norm.includes("radar") || norm.includes("vaga") || norm.includes("vagas") || norm.includes("flash") || norm.includes("tempo real") || norm.includes("desmarc")) {
     return res.json({
-      reply: `⚡ **Radar de Vagas em Tempo Real:**\n\nNo topo da nossa página inicial tens um **Radar ao Vivo** com as vagas disponíveis para os próximos dias!\n\n• Podes alternar facilmente entre o radar do **Diogo Viegas** e o do **Sandro Miguel**.\n• Se surgir uma desmarcação com menos de 2 horas de antecedência, aparece como **Vaga Flash ⚡**, permitindo-te marcar imediatamente na hora!\n\nClica no dia pretendido no radar para ires direto ao agendamento com esse barbeiro.`,
+      reply: `⚡ **Radar de Vagas em Tempo Real:**\n\nNo topo da nossa página inicial tens um **Radar ao Vivo** com as vagas disponíveis para os próximos dias!\n\n• Podes alternar facilmente entre o radar do **Diogo Viegas** e o do **Sandro Miguel**.\n• Ao sábado, o Sandro disponibiliza vagas até às **18:00**.\n• Se surgir uma desmarcação com menos de 2 horas de antecedência, aparece como **Vaga Flash ⚡**, permitindo-te marcar imediatamente na hora!\n\nClica no dia pretendido no radar para ires direto ao agendamento com esse barbeiro.`,
     });
   }
 
@@ -1379,7 +1416,7 @@ app.post("/api/assistant", async (req, res) => {
 
   if (norm.includes("hora") || norm.includes("horario") || norm.includes("abre") || norm.includes("fecha") || norm.includes("almoco") || /\b(que horas|horarios)\b/.test(norm)) {
     return res.json({
-      reply: `🕒 **Horário de Funcionamento:**\n\n• **Segunda-feira**: 09:00 — 19:00\n• **Terça-feira**: 09:00 — 20:00\n• **Quarta-feira**: 09:00 — 19:00\n• **Quinta-feira**: 09:00 — 19:00\n• **Sexta-feira**: 09:00 — 20:00\n• **Sábado**: 09:00 — 12:00\n• **Domingo**: Encerrado\n\n🥪 *Pausa de Almoço*: 13:00 — 13:30\n\n*Nota*: Ambos os barbeiros cumprem este horário.`,
+      reply: `🕒 **Horário de Funcionamento:**\n\n• **Segunda-feira**: 09:00 — 19:00\n• **Terça-feira**: 09:00 — 20:00\n• **Quarta-feira**: 09:00 — 19:00\n• **Quinta-feira**: 09:00 — 19:00\n• **Sexta-feira**: 09:00 — 20:00\n• **Sábado**:\n  - 💈 **Diogo Viegas**: 09:00 — 12:00\n  - 💈 **Sandro Miguel**: 09:00 — 18:00\n• **Domingo**: Encerrado\n\n🥪 *Pausa de Almoço*: 13:00 — 13:30`,
     });
   }
 
@@ -1967,36 +2004,37 @@ app.post("/api/bairro/book", async (req, res) => {
     const settings = await getSettings();
     const slotMs = new Date(`${date}T${startTime}:00`).getTime();
 
-    const openMinutes = timeToMinutes(daySched.open);
-    const closeMinutes = timeToMinutes(daySched.close);
-    const lunchEnd = timeToMinutes(settings.lunchEnd);
-
-    if (
-      startMins < openMinutes ||
-      endMins > closeMinutes ||
-      (closeMinutes > lunchEnd && overlaps(startMins, endMins, timeToMinutes(settings.lunchStart), lunchEnd))
-    ) {
-      return res.status(400).json({ error: `Horário indisponível. Horário à ${daySched.label}: ${daySched.open} às ${daySched.close}.` });
-    }
-
-    if (slotMs < Date.now()) {
-      return res.status(400).json({ error: "Este horário já passou. Por favor escolhe um horário futuro." });
-    }
-
     const requestedBarberId = String(body.barberId || "any");
     const activeBarbers = await getActiveBarbers();
     const appts = await db.appointments().find({ date, status: "SCHEDULED" }).toArray();
     const blocked = await db.blocked_times().find({ date }).toArray();
 
+    // Validar horário tendo em conta o barbeiro específico (ex: Sandro ao sábado até às 18:00)
     let assignedBarber = null;
     if (requestedBarberId !== "any" && requestedBarberId !== "") {
+      const barberSched = getBarberDaySchedule(requestedBarberId, date);
+      const bClose = timeToMinutes(barberSched.close);
+      if (
+        startMins < openMinutes ||
+        endMins > bClose ||
+        (bClose > lunchEnd && overlaps(startMins, endMins, timeToMinutes(settings.lunchStart), lunchEnd))
+      ) {
+        return res.status(400).json({ error: `Horário indisponível. Horário do barbeiro à ${barberSched.label}: ${barberSched.open} às ${barberSched.close}.` });
+      }
+
       const busy = isBarberBusy(requestedBarberId, startMins, endMins, appts, blocked);
       if (busy) {
         return res.status(409).json({ error: "Este horário já não está disponível com o barbeiro selecionado. Por favor escolhe outro." });
       }
       assignedBarber = activeBarbers.find((b) => b.id === requestedBarberId) || { id: requestedBarberId, name: "Barbeiro" };
     } else {
-      const freeBarbers = activeBarbers.filter((b) => !isBarberBusy(b.id, startMins, endMins, appts, blocked));
+      const freeBarbers = activeBarbers.filter((b) => {
+        const bSched = getBarberDaySchedule(b.id, date);
+        const bClose = timeToMinutes(bSched.close);
+        if (startMins < openMinutes || endMins > bClose) return false;
+        if (bClose > lunchEnd && overlaps(startMins, endMins, timeToMinutes(settings.lunchStart), lunchEnd)) return false;
+        return !isBarberBusy(b.id, startMins, endMins, appts, blocked);
+      });
       if (!freeBarbers.length) {
         return res.status(409).json({ error: "Este horário acabou de ser reservado por outro cliente. Por favor escolhe outro." });
       }
@@ -2217,10 +2255,13 @@ app.get("/api/bairro/radar", async (req, res) => {
 
       let freeCount = 0;
       let hasFlash = false;
+      const barberSched = requestedBarberId !== "any" && requestedBarberId !== ""
+        ? getBarberDaySchedule(requestedBarberId, iso)
+        : sched;
 
       if (!sched.closed) {
-        const openMin = timeToMinutes(sched.open);
-        const closeMin = timeToMinutes(sched.close);
+        const openMin = timeToMinutes(barberSched.open);
+        const closeMin = timeToMinutes(barberSched.close);
         const lunchStart = timeToMinutes(settings.lunchStart);
         const lunchEnd = timeToMinutes(settings.lunchEnd);
 
@@ -2239,7 +2280,11 @@ app.get("/api/bairro/radar", async (req, res) => {
             const busy = isBarberBusy(requestedBarberId, mins, end, appts, blocked);
             if (!busy) freeCount++;
           } else {
-            const freeInSlot = activeBarbers.filter((b) => !isBarberBusy(b.id, mins, end, appts, blocked)).length;
+            const freeInSlot = activeBarbers.filter((b) => {
+              const bSched = getBarberDaySchedule(b.id, iso);
+              if (end > timeToMinutes(bSched.close)) return false;
+              return !isBarberBusy(b.id, mins, end, appts, blocked);
+            }).length;
             freeCount += freeInSlot;
             totalPossible += activeBarbers.length;
           }
@@ -2271,7 +2316,7 @@ app.get("/api/bairro/radar", async (req, res) => {
         label: i === 0 ? "Hoje" : i === 1 ? "Amanhã" : dayLabels[d.getDay()],
         dateFormatted: `${dayNum}/${m}`,
         closed: sched.closed,
-        hours: sched.closed ? "Encerrado" : `${sched.open} - ${sched.close}`,
+        hours: sched.closed ? "Encerrado" : `${barberSched.open} - ${barberSched.close}`,
         freeCount,
         hasFlash,
       });
