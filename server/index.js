@@ -636,9 +636,22 @@ app.get("/api/services", async (_req, res) => {
   res.json(services);
 });
 
-app.get("/api/gallery", async (_req, res) => {
-  const styles = await db.hair_styles().find({}).sort({ likes: -1 }).toArray();
-  res.json(styles.map((s) => ({ ...s, imageUrl: mediaUrl(s.imageUrl || s.image_url) })));
+app.get("/api/gallery", async (req, res) => {
+  const barber = String(req.query.barber || req.query.barberId || "all").toLowerCase();
+  const query = {};
+  if (barber === "diogo" || barber === DEFAULT_BARBER_ID) {
+    query.$or = [{ barber_id: DEFAULT_BARBER_ID }, { barber_name: "Diogo Viegas" }, { barber_id: { $exists: false } }];
+  } else if (barber === "sandro" || barber === SANDRO_BARBER_ID) {
+    query.$or = [{ barber_id: SANDRO_BARBER_ID }, { barber_name: "Sandro Miguel" }];
+  }
+  const styles = await db.hair_styles().find(query).sort({ likes: -1 }).toArray();
+  res.json(styles.map((s) => ({
+    ...s,
+    imageUrl: mediaUrl(s.imageUrl || s.image_url),
+    barber_id: s.barber_id || DEFAULT_BARBER_ID,
+    barber_name: s.barber_name || (s.barber_id === SANDRO_BARBER_ID ? SANDRO_BARBER_NAME : DEFAULT_BARBER_NAME),
+    barber_handle: s.barber_handle || (s.barber_id === SANDRO_BARBER_ID ? "@sandro_miguel22_" : "@v_barber8"),
+  })));
 });
 
 app.post("/api/gallery/:id/like", async (req, res) => {
@@ -1391,6 +1404,12 @@ app.post("/api/assistant", async (req, res) => {
   if (norm.includes("avali") || norm.includes("feedback") || norm.includes("estrela")) {
     return res.json({
       reply: `⭐ **Avaliações dos Clientes:**\n\nTodas as nossas avaliações são 100% verificadas e deixadas exclusivamente por clientes reais após o corte. Podes consultar o feedback na secção da página inicial.`,
+    });
+  }
+
+  if (norm.includes("galeria") || norm.includes("foto") || norm.includes("fotos") || norm.includes("trabalho") || norm.includes("estilo")) {
+    return res.json({
+      reply: `📸 **Portfólio & Galeria de Cortes:**\n\nNo nosso site podes consultar as fotos reais dos trabalhos executados por cada barbeiro:\n\n• **Cortes do Diogo Viegas**: Fades clássicos, tranças com fade, twists texturados, caracóis e barboterapia.\n• **Cortes do Sandro Miguel**: Blonde crop platinado, french crop alinhado, buzz cut com skin fade e desenhos tribais freestyle.\n\nNa secção **"Portfólio de Cortes"** podes filtrar por **Diogo Viegas** ou **Sandro Miguel**, e clicar diretamente na foto para agendar esse estilo!`,
     });
   }
 

@@ -909,9 +909,18 @@ const VB = (() => {
         </section>
         <section class="section section-alt">
           <div class="wrap">
-            <div class="row"><div><div class="eyebrow">Portefólio</div><h2 class="h2">TRABALHOS DO DIOGO</h2></div><a href="/galeria" style="color:var(--accent);font-weight:700">Ver Mais Fotos →</a></div>
+            <div class="row"><div><div class="eyebrow">Portefólio da Barbearia</div><h2 class="h2">CORTES DE DIOGO & SANDRO</h2></div><a href="/galeria" style="color:var(--accent);font-weight:700">Ver Galeria Completa →</a></div>
             ${data.styles.length ? `<div class="grid-3" style="margin-top:1.5rem">
-              ${data.styles.slice(0, 6).map((s) => `<div class="card" style="padding:0;overflow:hidden"><div class="thumb" style="height:18rem"><img src="${s.imageUrl}" alt="Trabalho Diogo Viegas"></div></div>`).join("")}
+              ${data.styles.slice(0, 6).map((s) => `
+                <div class="card" style="padding:0;overflow:hidden;position:relative">
+                  <div class="thumb" style="height:19rem;position:relative">
+                    <img src="${s.imageUrl}" alt="${escapeHtml(s.title || "Corte")}">
+                    <div style="position:absolute;bottom:0.5rem;left:0.5rem;right:0.5rem;background:rgba(10,10,12,0.85);backdrop-filter:blur(8px);border-radius:0.5rem;padding:0.35rem 0.55rem;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,0.12)">
+                      <span style="font-weight:800;color:${s.barber_name?.includes("Sandro") ? "#60a5fa" : "var(--accent)"};font-size:0.72rem">💈 ${escapeHtml(s.barber_name || "Diogo Viegas")}</span>
+                      <span style="font-size:0.68rem;color:rgba(255,255,255,0.85)">${escapeHtml(s.title || "")}</span>
+                    </div>
+                  </div>
+                </div>`).join("")}
             </div>
             <div style="text-align:center;margin-top:2.2rem">
               <a class="brand-button btn" href="/marcar" style="padding:.9rem 2.2rem;font-weight:800;font-size:0.95rem">MARCAR HORÁRIO</a>
@@ -976,34 +985,73 @@ const VB = (() => {
   }
 
   async function pageGaleria() {
-    const styles = await api("/api/gallery");
-    document.getElementById("app").innerHTML = `
-      ${navHtml()}
-      <main class="page-shell wrap section">
-        <div style="text-align:center;max-width:38rem;margin:0 auto 2.5rem">
-          <div class="eyebrow">Portefólio</div>
-          <h1 class="h2">TRABALHOS DO DIOGO</h1>
-          <p class="muted" style="margin-top:.5rem">Registos reais do dia a dia na Viegas Barber. Atendimento personalizado e cortes à medida de cada cliente.</p>
-          <div style="margin-top:1.5rem">
-            <a class="brand-button btn" href="/marcar" style="padding:.8rem 2rem;font-weight:800;font-size:0.95rem">MARCAR HORÁRIO</a>
+    const allStyles = await api("/api/gallery");
+    let currentFilter = "diogo";
+
+    const render = () => {
+      const filtered = allStyles.filter((s) => {
+        if (currentFilter === "all") return true;
+        if (currentFilter === "sandro") return s.barber_name?.includes("Sandro") || s.barber_id === "barber-sandro-miguel";
+        return s.barber_name?.includes("Diogo") || s.barber_id === "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" || !s.barber_id;
+      });
+
+      const diogoCount = allStyles.filter((s) => s.barber_name?.includes("Diogo") || s.barber_id === "ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" || !s.barber_id).length;
+      const sandroCount = allStyles.filter((s) => s.barber_name?.includes("Sandro") || s.barber_id === "barber-sandro-miguel").length;
+
+      document.getElementById("app").innerHTML = `
+        ${navHtml()}
+        <main class="page-shell wrap section">
+          <div style="text-align:center;max-width:38rem;margin:0 auto 2.2rem">
+            <div class="eyebrow">Portefólio da Equipa</div>
+            <h1 class="h2">GALERIA DE CORTES</h1>
+            <p class="muted" style="margin-top:.5rem">Cortes reais executados na Viegas Barber por Diogo Viegas e Sandro Miguel.</p>
+            
+            <div style="display:flex;justify-content:center;gap:.6rem;margin-top:1.5rem;flex-wrap:wrap">
+              <button type="button" class="btn ${currentFilter === "diogo" ? "brand-button" : "btn-ghost"}" id="filter-diogo" style="font-size:0.85rem;padding:.5rem 1.15rem;border-radius:9999px">
+                💈 Diogo Viegas (${diogoCount})
+              </button>
+              <button type="button" class="btn ${currentFilter === "sandro" ? "brand-button" : "btn-ghost"}" id="filter-sandro" style="font-size:0.85rem;padding:.5rem 1.15rem;border-radius:9999px">
+                💈 Sandro Miguel (${sandroCount})
+              </button>
+              <button type="button" class="btn ${currentFilter === "all" ? "brand-button" : "btn-ghost"}" id="filter-all" style="font-size:0.85rem;padding:.5rem 1.15rem;border-radius:9999px">
+                👥 Todos (${allStyles.length})
+              </button>
+            </div>
           </div>
-        </div>
-        ${styles.length ? `<div class="grid-3" id="gallery-grid">
-          ${styles.map((s) => `
-            <div class="card" style="padding:0;overflow:hidden">
-              <div class="thumb" style="height:20rem"><img src="${s.imageUrl}" alt="Trabalho Diogo Viegas"></div>
-            </div>`).join("")}
-        </div>
-        <div style="text-align:center;margin-top:3rem">
-          <a class="brand-button btn" href="/marcar" style="padding:.9rem 2.5rem;font-weight:800;font-size:1rem">MARCAR HORÁRIO</a>
-        </div>` : `
-        <div class="card" style="text-align:center;padding:3.5rem 1.5rem">
-          <div style="font-size:3.5rem;margin-bottom:1rem">💈</div>
-          <h3>Galeria em Atualização</h3>
-          <p class="muted" style="max-width:32rem;margin:0 auto 1.5rem">Estamos a carregar as novas fotografias dos trabalhos do Diogo Viegas.</p>
-          <a class="brand-button btn" href="/marcar">Marcar Horário</a>
-        </div>`}
-      </main>${footerHtml()}`;
+
+          ${filtered.length ? `<div class="grid-3" id="gallery-grid">
+            ${filtered.map((s) => `
+              <div class="card" style="padding:0;overflow:hidden;position:relative">
+                <div class="thumb" style="height:21rem;position:relative">
+                  <img src="${s.imageUrl}" alt="${escapeHtml(s.title || "Corte")}">
+                  <div style="position:absolute;bottom:0.6rem;left:0.6rem;right:0.6rem;background:rgba(10,10,12,0.85);backdrop-filter:blur(8px);border-radius:0.6rem;padding:0.4rem 0.6rem;display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(255,255,255,0.12)">
+                    <span style="font-weight:800;color:${s.barber_name?.includes("Sandro") ? "#60a5fa" : "var(--accent)"};font-size:0.75rem">💈 ${escapeHtml(s.barber_name || "Diogo Viegas")}</span>
+                    <span style="font-size:0.72rem;color:rgba(255,255,255,0.85)">${escapeHtml(s.title || "")}</span>
+                  </div>
+                </div>
+                <div style="padding:0.85rem 1rem;display:flex;justify-content:space-between;align-items:center">
+                  <span class="muted" style="font-size:0.8rem">${escapeHtml(s.category || "Corte")}</span>
+                  <a href="/marcar" class="brand-button btn" style="padding:0.35rem 0.8rem;font-size:0.75rem;font-weight:700">Marcar Corte →</a>
+                </div>
+              </div>`).join("")}
+          </div>
+          <div style="text-align:center;margin-top:3rem">
+            <a class="brand-button btn" href="/marcar" style="padding:.9rem 2.5rem;font-weight:800;font-size:1rem">MARCAR HORÁRIO</a>
+          </div>` : `
+          <div class="card" style="text-align:center;padding:3.5rem 1.5rem">
+            <div style="font-size:3.5rem;margin-bottom:1rem">💈</div>
+            <h3>Galeria em Atualização</h3>
+            <p class="muted" style="max-width:32rem;margin:0 auto 1.5rem">Estamos a carregar as novas fotografias dos trabalhos.</p>
+            <a class="brand-button btn" href="/marcar">Marcar Horário</a>
+          </div>`}
+        </main>${footerHtml()}`;
+
+      document.getElementById("filter-diogo")?.addEventListener("click", () => { currentFilter = "diogo"; render(); });
+      document.getElementById("filter-sandro")?.addEventListener("click", () => { currentFilter = "sandro"; render(); });
+      document.getElementById("filter-all")?.addEventListener("click", () => { currentFilter = "all"; render(); });
+    };
+
+    render();
   }
 
   async function pageLoja() {

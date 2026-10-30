@@ -1106,6 +1106,53 @@
       color: var(--gold);
     }
 
+    /* Gallery Barber Filter */
+    .gallery-barber-filter {
+      display: flex;
+      gap: 0.5rem;
+      margin: 0.2rem 0 1.25rem;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .gallery-filter-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 9999px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 0.45rem 0.95rem;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .gallery-filter-btn:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      color: #fff;
+    }
+    .gallery-filter-btn.active {
+      background: var(--gold);
+      border-color: var(--gold);
+      color: #000;
+      font-weight: 700;
+    }
+    .gallery-filter-count {
+      font-size: 0.68rem;
+      opacity: 0.85;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 0.1rem 0.45rem;
+      border-radius: 9999px;
+    }
+    .gallery-filter-btn.active .gallery-filter-count {
+      background: rgba(0, 0, 0, 0.2);
+      color: #000;
+      font-weight: 700;
+    }
+
     /* Gallery Grid */
     .gallery-grid {
       display: grid;
@@ -1121,11 +1168,20 @@
     }
 
     .gallery-item {
+      position: relative;
       border-radius: 0.85rem;
       overflow: hidden;
       aspect-ratio: 4 / 5;
       border: 1px solid var(--card-border);
       background: #181a20;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      border-color: rgba(212, 175, 55, 0.6);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
     }
 
     .gallery-item img {
@@ -1133,11 +1189,55 @@
       height: 100%;
       object-fit: cover;
       object-position: center 12%;
-      transition: transform 0.3s;
+      transition: transform 0.35s ease;
     }
 
     .gallery-item:hover img {
-      transform: scale(1.05);
+      transform: scale(1.06);
+    }
+
+    .gallery-item-badge {
+      position: absolute;
+      bottom: 0.45rem;
+      left: 0.45rem;
+      right: 0.45rem;
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 0.6rem;
+      padding: 0.35rem 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.72rem;
+      color: #fff;
+      pointer-events: none;
+      transition: all 0.2s ease;
+    }
+
+    .gallery-item:hover .gallery-item-badge {
+      background: rgba(10, 10, 12, 0.95);
+      border-color: var(--gold);
+    }
+
+    .gallery-barber-tag {
+      font-weight: 800;
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.72rem;
+    }
+
+    .gallery-style-name {
+      color: rgba(255, 255, 255, 0.85);
+      font-size: 0.68rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 50%;
+      text-align: right;
     }
 
     /* Products Grid */
@@ -1686,20 +1786,24 @@
 
     <!-- Slideshow com fotos de cortes a mudar devagar -->
     <div class="slideshow-wrapper" id="cortes-slideshow">
-      <img src="/img/cortes/corte-5.jpg" alt="Tranças com Fade" class="slide-img active">
-      <img src="/img/cortes/corte-6.jpg" alt="Twists com Taper Fade" class="slide-img">
-      <img src="/img/cortes/corte-7.jpg" alt="Caracóis & Mid Fade" class="slide-img">
-      <img src="/img/cortes/corte-1.jpg" alt="Degradê Fade" class="slide-img">
-      <img src="/img/cortes/corte-2.jpg" alt="Corte & Barboterapia" class="slide-img">
-      <img src="/img/cortes/corte-3.jpg" alt="Acabamento Navalha" class="slide-img">
+      <img src="/img/cortes/corte-5.jpg" alt="Tranças com Fade" class="slide-img active" data-barber="Diogo Viegas" data-title="Tranças com Fade Preciso">
+      <img src="/img/cortes/sandro-1.jpg" alt="Blonde Crop com High Fade" class="slide-img" data-barber="Sandro Miguel" data-title="Blonde Crop & High Fade">
+      <img src="/img/cortes/corte-6.jpg" alt="Twists com Taper Fade" class="slide-img" data-barber="Diogo Viegas" data-title="Twists & Taper Fade Moderno">
+      <img src="/img/cortes/sandro-2.jpg" alt="French Crop com Low Fade" class="slide-img" data-barber="Sandro Miguel" data-title="French Crop & Low Fade">
+      <img src="/img/cortes/corte-1.jpg" alt="Degradê Fade" class="slide-img" data-barber="Diogo Viegas" data-title="Degradê Milimétrico (Fade)">
+      <img src="/img/cortes/sandro-3.jpg" alt="Buzz Cut com Barba" class="slide-img" data-barber="Sandro Miguel" data-title="Buzz Cut & Barba Alinhada">
+      <img src="/img/cortes/corte-2.jpg" alt="Corte & Barboterapia" class="slide-img" data-barber="Diogo Viegas" data-title="Corte & Barboterapia Tradicional">
+      <img src="/img/cortes/sandro-4.jpg" alt="Freestyle Tribal" class="slide-img" data-barber="Sandro Miguel" data-title="Freestyle Tribal & Caracóis">
       <div class="slide-overlay"></div>
       <div class="slide-caption">
         <div>
-          <div class="slide-tag">Viegas Barber • Portfólio</div>
-          <div class="slide-heading" id="slide-text">Tranças & Degradê Perfeito</div>
+          <div class="slide-tag" id="slide-tag">Diogo Viegas • Portfólio</div>
+          <div class="slide-heading" id="slide-text">Tranças com Fade Preciso</div>
         </div>
         <div class="slide-dots">
           <span class="dot active"></span>
+          <span class="dot"></span>
+          <span class="dot"></span>
           <span class="dot"></span>
           <span class="dot"></span>
           <span class="dot"></span>
@@ -1844,17 +1948,98 @@
       </div>
     </div>
 
-    <!-- Galeria de Cortes -->
+    <!-- Galeria de Cortes com separação por Barbeiro -->
     <div class="section-title" id="cortes">
-      Algumas fotos de <span>cortes</span>
+      Portfólio de <span>Cortes</span>
     </div>
+
+    <!-- Filtro de Barbeiro na Galeria -->
+    <div class="gallery-barber-filter">
+      <button type="button" class="gallery-filter-btn active" data-gallery-barber="diogo">
+        💈 Diogo Viegas <span class="gallery-filter-count">6 fotos</span>
+      </button>
+      <button type="button" class="gallery-filter-btn" data-gallery-barber="sandro">
+        💈 Sandro Miguel <span class="gallery-filter-count">4 fotos</span>
+      </button>
+      <button type="button" class="gallery-filter-btn" data-gallery-barber="all">
+        👥 Todos os Cortes
+      </button>
+    </div>
+
     <div class="gallery-grid" id="gallery-container">
-      <div class="gallery-item"><img src="/img/cortes/corte-5.jpg" alt="Tranças com Fade Viegas Barber" loading="lazy"></div>
-      <div class="gallery-item"><img src="/img/cortes/corte-6.jpg" alt="Twists & Fade Viegas Barber" loading="lazy"></div>
-      <div class="gallery-item"><img src="/img/cortes/corte-7.jpg" alt="Caracóis & Mid Fade Viegas Barber" loading="lazy"></div>
-      <div class="gallery-item"><img src="/img/cortes/corte-1.jpg" alt="Degradê Fade Viegas Barber" loading="lazy"></div>
-      <div class="gallery-item"><img src="/img/cortes/corte-2.jpg" alt="Corte & Barba Viegas Barber" loading="lazy"></div>
-      <div class="gallery-item"><img src="/img/cortes/corte-3.jpg" alt="Acabamento Navalha Viegas Barber" loading="lazy"></div>
+      <!-- CORTES DO DIOGO VIEGAS -->
+      <div class="gallery-item" data-barber="diogo" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" title="Clica para marcar com o Diogo">
+        <img src="/img/cortes/corte-5.jpg" alt="Tranças com Fade - Diogo Viegas" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag">💈 Diogo Viegas</span>
+          <span class="gallery-style-name">Tranças & Fade</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="diogo" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" title="Clica para marcar com o Diogo">
+        <img src="/img/cortes/corte-6.jpg" alt="Twists & Fade - Diogo Viegas" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag">💈 Diogo Viegas</span>
+          <span class="gallery-style-name">Twists & Taper</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="diogo" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" title="Clica para marcar com o Diogo">
+        <img src="/img/cortes/corte-7.jpg" alt="Caracóis & Mid Fade - Diogo Viegas" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag">💈 Diogo Viegas</span>
+          <span class="gallery-style-name">Caracóis & Fade</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="diogo" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" title="Clica para marcar com o Diogo">
+        <img src="/img/cortes/corte-1.jpg" alt="Degradê Fade - Diogo Viegas" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag">💈 Diogo Viegas</span>
+          <span class="gallery-style-name">Fade Clássico</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="diogo" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" title="Clica para marcar com o Diogo">
+        <img src="/img/cortes/corte-2.jpg" alt="Corte & Barba - Diogo Viegas" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag">💈 Diogo Viegas</span>
+          <span class="gallery-style-name">Corte & Barba</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="diogo" data-barber-id="ba5d4352-bbfc-4c09-92a9-9ed1bfe5bbb9" title="Clica para marcar com o Diogo">
+        <img src="/img/cortes/corte-3.jpg" alt="Acabamento Navalha - Diogo Viegas" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag">💈 Diogo Viegas</span>
+          <span class="gallery-style-name">Taper & Navalha</span>
+        </div>
+      </div>
+
+      <!-- CORTES DO SANDRO MIGUEL -->
+      <div class="gallery-item" data-barber="sandro" data-barber-id="barber-sandro-miguel" title="Clica para marcar com o Sandro" style="display:none">
+        <img src="/img/cortes/sandro-1.jpg" alt="Blonde Crop & High Fade - Sandro Miguel" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag" style="color:#60a5fa">💈 Sandro Miguel</span>
+          <span class="gallery-style-name">Blonde Crop</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="sandro" data-barber-id="barber-sandro-miguel" title="Clica para marcar com o Sandro" style="display:none">
+        <img src="/img/cortes/sandro-2.jpg" alt="French Crop & Low Fade - Sandro Miguel" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag" style="color:#60a5fa">💈 Sandro Miguel</span>
+          <span class="gallery-style-name">French Crop</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="sandro" data-barber-id="barber-sandro-miguel" title="Clica para marcar com o Sandro" style="display:none">
+        <img src="/img/cortes/sandro-3.jpg" alt="Buzz Cut & Skin Fade com Barba - Sandro Miguel" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag" style="color:#60a5fa">💈 Sandro Miguel</span>
+          <span class="gallery-style-name">Skin Fade & Barba</span>
+        </div>
+      </div>
+      <div class="gallery-item" data-barber="sandro" data-barber-id="barber-sandro-miguel" title="Clica para marcar com o Sandro" style="display:none">
+        <img src="/img/cortes/sandro-4.jpg" alt="Freestyle Tribal & Taper Fade - Sandro Miguel" loading="lazy">
+        <div class="gallery-item-badge">
+          <span class="gallery-barber-tag" style="color:#60a5fa">💈 Sandro Miguel</span>
+          <span class="gallery-style-name">Freestyle Tribal</span>
+        </div>
+      </div>
     </div>
 
     <!-- Produtos Oficiais -->
@@ -2113,24 +2298,21 @@
     function initSlideshow() {
       const slides = document.querySelectorAll(".slide-img");
       const dots = document.querySelectorAll(".slide-dots .dot");
-      const titles = [
-        "Tranças com Fade Preciso",
-        "Twists & Taper Fade Moderno",
-        "Caracóis com Acabamento na Régua",
-        "Degradê Milimétrico (Fade)",
-        "Corte & Modelação de Barba",
-        "Acabamento Navalha de Alta Precisão"
-      ];
       const titleElem = document.getElementById("slide-text");
+      const tagElem = document.getElementById("slide-tag");
       let cur = 0;
 
       setInterval(() => {
+        if (!slides.length) return;
         slides[cur].classList.remove("active");
-        dots[cur].classList.remove("active");
+        if (dots[cur]) dots[cur].classList.remove("active");
         cur = (cur + 1) % slides.length;
         slides[cur].classList.add("active");
-        dots[cur].classList.add("active");
-        if (titleElem) titleElem.textContent = titles[cur];
+        if (dots[cur]) dots[cur].classList.add("active");
+        const barberName = slides[cur].getAttribute("data-barber");
+        const titleText = slides[cur].getAttribute("data-title");
+        if (titleElem && titleText) titleElem.textContent = titleText;
+        if (tagElem && barberName) tagElem.textContent = `${barberName} • Portfólio`;
       }, 4200);
     }
 
@@ -2244,6 +2426,32 @@
         card.addEventListener("click", () => {
           const bId = card.getAttribute("data-barber-id") || "any";
           selectBarber(bId);
+        });
+      });
+
+      // Filtros de Barbeiro na Galeria
+      document.querySelectorAll(".gallery-filter-btn").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".gallery-filter-btn").forEach((b) => b.classList.remove("active"));
+          btn.classList.add("active");
+          const barber = btn.getAttribute("data-gallery-barber") || "all";
+          document.querySelectorAll(".gallery-item").forEach((item) => {
+            const itemBarber = item.getAttribute("data-barber");
+            if (barber === "all" || itemBarber === barber) {
+              item.style.display = "block";
+            } else {
+              item.style.display = "none";
+            }
+          });
+        });
+      });
+
+      // Clique numa foto da galeria para selecionar barbeiro e marcar
+      document.querySelectorAll(".gallery-item").forEach((item) => {
+        item.addEventListener("click", () => {
+          const bId = item.getAttribute("data-barber-id");
+          if (bId) selectBarber(bId);
+          document.getElementById("marcar")?.scrollIntoView({ behavior: "smooth" });
         });
       });
 
