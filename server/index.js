@@ -2002,6 +2002,9 @@ app.post("/api/bairro/book", async (req, res) => {
     const endMins = startMins + slotDuration;
     const endTime = minutesToTime(endMins);
     const settings = await getSettings();
+    const openMinutes = timeToMinutes(daySched.open);
+    const lunchStart = timeToMinutes(settings.lunchStart);
+    const lunchEnd = timeToMinutes(settings.lunchEnd);
     const slotMs = new Date(`${date}T${startTime}:00`).getTime();
 
     const requestedBarberId = String(body.barberId || "any");
@@ -2032,7 +2035,7 @@ app.post("/api/bairro/book", async (req, res) => {
         const bSched = getBarberDaySchedule(b.id, date);
         const bClose = timeToMinutes(bSched.close);
         if (startMins < openMinutes || endMins > bClose) return false;
-        if (bClose > lunchEnd && overlaps(startMins, endMins, timeToMinutes(settings.lunchStart), lunchEnd)) return false;
+        if (bClose > lunchEnd && overlaps(startMins, endMins, lunchStart, lunchEnd)) return false;
         return !isBarberBusy(b.id, startMins, endMins, appts, blocked);
       });
       if (!freeBarbers.length) {

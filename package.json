@@ -10,7 +10,7 @@
     "next:dev": "next dev",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
-    "postinstall": "prisma skills sync || exit 0"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
